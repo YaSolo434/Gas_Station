@@ -6,7 +6,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interfaces/InteractionInterface.h"
 #include "DrawDebugHelpers.h"
+#include "UserInterface/BurgerHUD.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -46,6 +48,8 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	HUD = Cast<ABurgerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	//Limit camera
 	if (APlayerCameraManager* const CameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager)
@@ -99,6 +103,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		                                   &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this,
 		                                   &ACharacter::StopJumping);
+
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &APlayerCharacter::BeginInteract);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this,
+		                                   &APlayerCharacter::EndInteract);
 	}
 }
 
@@ -106,8 +115,8 @@ void APlayerCharacter::PerformInteractionCheck()
 {
 	InteractionData.LastInteractionTime = GetWorld()->GetTimeSeconds();
 
-	FVector TraceStart{GetPawnViewLocation()};
-	FVector TraceEnd{TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance)};
+	const FVector TraceStart{GetPawnViewLocation()};
+	const FVector TraceEnd{TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance)};
 
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0, 0, 2.0f);
 
@@ -120,9 +129,7 @@ void APlayerCharacter::PerformInteractionCheck()
 	{
 		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 		{
-			float Distance = FVector::Distance(TraceStart, HitResult.ImpactPoint);
-
-			if (HitResult.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance)
+			if (HitResult.GetActor() != InteractionData.CurrentInteractable)
 			{
 				FoundInteractable(HitResult.GetActor());
 				return;
@@ -139,22 +146,94 @@ void APlayerCharacter::PerformInteractionCheck()
 
 void APlayerCharacter::FoundInteractable(AActor* NewInteractable)
 {
+	//checks if new interactable found if it founds it ends interaction with the previous one
+	if (IsInteracting())
+	{
+		EndInteract();
+	}
+
+	// checks if we have Current interactable
+	if (InteractionData.CurrentInteractable)
+	{
+		TargetInteractable = InteractionData.CurrentInteractable;
+		TargetInteractable->EndFocus();
+	}
+
+	//assign the new interaction target
+	InteractionData.CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+
+	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+
+	TargetInteractable->BeginFocus();
 }
 
 void APlayerCharacter::NoInteractableFound()
 {
+	if (IsInteracting())
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	}
+
+	if (InteractionData.CurrentInteractable)
+	{
+		if (TargetInteractable.GetObject())
+		{
+			TargetInteractable->EndFocus();
+		}
+	}
+
+	HUD->HideInteractionWidget();
+
+	TargetInteractable = nullptr;
+	InteractionData.CurrentInteractable = nullptr;
 }
 
-void APlayerCharacter::BeginInteraction()
+void APlayerCharacter::BeginInteract()
 {
+	// verify nothing has changed with the interactable state since beginning interaction
+	PerformInteractionCheck();
+
+	if (InteractionData.CurrentInteractable)
+	{
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->BeginInteract();
+
+			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+			{
+				Interact();
+			}
+			else
+			{
+				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
+				                                this,
+				                                &APlayerCharacter::Interact,
+				                                TargetInteractable->InteractableData.InteractionDuration,
+				                                false);
+			}
+		}
+	}
 }
 
-void APlayerCharacter::EndInteraction()
+void APlayerCharacter::EndInteract()
 {
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->EndInteract();
+	}
 }
 
 void APlayerCharacter::Interact()
 {
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->Interact(this);
+	}
 }
 
 void APlayerCharacter::MoveForward(const FInputActionValue& Value)

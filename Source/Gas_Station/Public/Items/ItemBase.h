@@ -47,6 +47,6 @@ public:
 protected:
 	bool operator==(const FName& OtherName) const
 	{
-		return Name == OtherName;
+		return this->Name == OtherName;
 	}
 };

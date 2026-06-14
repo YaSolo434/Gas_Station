@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
+class APlayerCharacter;
+
 UENUM()
 enum class EInteractableType : uint8
 {
@@ -59,7 +61,9 @@ class GAS_STATION_API IInteractionInterface
 public:
 	virtual void BeginFocus() = 0;
 	virtual void EndFocus() = 0;
-	virtual void BeginInteraction() = 0;
-	virtual void EndInteraction() = 0;
-	virtual void Interact() = 0;
+	virtual void BeginInteract() = 0;
+	virtual void EndInteract() = 0;
+	virtual void Interact(APlayerCharacter* PlayerCharacter) = 0;
+
+	FInteractableData InteractableData;
 };

@@ -6,6 +6,8 @@
 
 #include "PlayerCharacter.generated.h"
 
+class ABurgerHUD;
+
 USTRUCT()
 struct FInteractionData
 {
@@ -37,6 +39,9 @@ protected:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
 	//=================================================================================================
+	UPROPERTY()
+	ABurgerHUD* HUD;
+
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* FirstPersonCamera;
 
@@ -72,8 +77,8 @@ protected:
 	void PerformInteractionCheck();
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
-	void BeginInteraction();
-	void EndInteraction();
+	void BeginInteract();
+	void EndInteract();
 	void Interact();
 
 	//Input functions
@@ -91,13 +96,15 @@ public:
 	// PROPERTIES & VARIABLES
 	//=================================================================================================
 	APlayerCharacter();
-	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//=================================================================================================
 	// FUNCTIONS
 	//=================================================================================================
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
 
 protected:
 	//=================================================================================================
@@ -117,4 +124,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* InteractAction;
 };
