@@ -9,7 +9,7 @@ UItemBase* UItemBase::CreateItemCopy() const
 {
 	UItemBase* ItemCopy = NewObject<UItemBase>(StaticClass());
 
-	ItemCopy->Name = this->Name;
+	ItemCopy->ID = this->ID;
 	ItemCopy->AssetData = this->AssetData;
 	ItemCopy->ItemType = this->ItemType;
 	ItemCopy->DescriptiveText = this->DescriptiveText;

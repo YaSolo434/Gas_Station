@@ -59,11 +59,11 @@ class GAS_STATION_API IInteractionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void BeginFocus() = 0;
-	virtual void EndFocus() = 0;
-	virtual void BeginInteract() = 0;
-	virtual void EndInteract() = 0;
-	virtual void Interact(APlayerCharacter* PlayerCharacter) = 0;
+	virtual void BeginFocus();
+	virtual void EndFocus();
+	virtual void BeginInteract();
+	virtual void EndInteract();
+	virtual void Interact(APlayerCharacter* PlayerCharacter);
 
 	FInteractableData InteractableData;
 };

@@ -22,7 +22,7 @@ public:
 	// PROPERTIES & VARIABLES
 	//=================================================================================================
 	UPROPERTY(EditAnywhere, Category = "ItemData")
-	FName Name;
+	FName ID;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemAssetData AssetData;
@@ -45,8 +45,8 @@ public:
 	virtual void Use(APlayerCharacter* PlayerCharacter);
 
 protected:
-	bool operator==(const FName& OtherName) const
+	bool operator==(const FName& OtherID) const
 	{
-		return this->Name == OtherName;
+		return this->ID == OtherID;
 	}
 };

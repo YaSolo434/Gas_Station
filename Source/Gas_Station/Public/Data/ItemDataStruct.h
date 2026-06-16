@@ -45,9 +45,9 @@ USTRUCT()
 struct FItemData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
-	
+
 	UPROPERTY(EditAnywhere, Category = "ItemData")
-	FName Name;
+	FName ID;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemAssetData AssetData;
