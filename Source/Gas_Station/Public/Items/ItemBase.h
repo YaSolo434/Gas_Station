@@ -10,6 +10,7 @@
 
 #include "ItemBase.generated.h"
 
+class UInventoryComponent;
 class APlayerCharacter;
 
 UCLASS()
@@ -21,6 +22,9 @@ public:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
 	//=================================================================================================
+	UPROPERTY()
+	UInventoryComponent* OwningInventory;
+
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FName ID;
 
@@ -33,10 +37,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemDescriptiveTextData DescriptiveText;
 
+	bool bIsCopy;
+	bool bIsPickup;
+
 	//=================================================================================================
 	// FUNCTIONS
 	//=================================================================================================
 	UItemBase();
+
+	void ResetItemFlags();
 
 	UFUNCTION(Category = "Item")
 	UItemBase* CreateItemCopy() const;

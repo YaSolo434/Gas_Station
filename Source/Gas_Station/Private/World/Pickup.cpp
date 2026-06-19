@@ -1,12 +1,14 @@
 // YaSolo
 #include "World/Pickup.h"
 
+#include "Characters/PlayerCharacter.h"
+#include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
 
 APickup::APickup()
 {
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
-	PickupMesh->SetSimulatePhysics(true);
+	PickupMesh->SetSimulatePhysics(false);
 	SetRootComponent(PickupMesh);
 }
 
@@ -31,9 +33,9 @@ void APickup::InitializePickup(const TSubclassOf<UItemBase> BaseClass)
 		ItemReference->AssetData = ItemData->AssetData;
 
 		PickupMesh->SetStaticMesh(ItemData->AssetData.Mesh);
-	}
 
-	UpdateInteractableData();
+		UpdateInteractableData();
+	}
 }
 
 void APickup::InitializeDrop(UItemBase* ItemToDrop)
@@ -78,11 +80,34 @@ void APickup::Interact(APlayerCharacter* PlayerCharacter)
 
 void APickup::TakePickup(const APlayerCharacter* Taker)
 {
-	if (!IsGarbageEliminationEnabled())
+	if (!IsPendingKillPending())
 	{
 		if (ItemReference)
 		{
-			//after hotbar implementation
+			if (UInventoryComponent* PlayerInventory = Taker->GetInventory())
+			{
+				const FItemAddResult AddResult = PlayerInventory->HandleAddItem(ItemReference);
+
+				switch (AddResult.OperationResult)
+				{
+				case EItemAddResult::IAR_NoItemAdded:
+					break;
+
+				case EItemAddResult::IAR_AllItemAdded:
+					Destroy();
+					break;
+				}
+
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *AddResult.ResultMessage.ToString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Player inventory component is null!!"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Pickup internal is somehow null!!!"));
 		}
 	}
 }

@@ -6,6 +6,8 @@
 
 #include "PlayerCharacter.generated.h"
 
+class UItemBase;
+class UInventoryComponent;
 class ABurgerHUD;
 
 USTRUCT()
@@ -63,6 +65,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
 	TScriptInterface<IInteractionInterface> TargetInteractable;
 
+	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
+	UInventoryComponent* PlayerInventory;
+
 	float InteractionCheckFrequency;
 
 	float InteractionCheckDistance;
@@ -91,6 +96,9 @@ protected:
 	UFUNCTION()
 	void Look(const FInputActionValue& Value);
 
+	void OnHotbarScroll(const FInputActionValue& Value);
+	void OnHotbarSelectSlot(const FInputActionValue& Value);
+
 public:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
@@ -104,27 +112,40 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void DropItem(const FInputActionValue& Value);
+
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
+
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
 
 protected:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
 	//=================================================================================================
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
 	UInputAction* MoveForwardAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
 	UInputAction* MoveRightAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
 	UInputAction* JumpAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Interaction")
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Hotbar")
+	UInputAction* HotbarScrollAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Hotbar")
+	UInputAction* HotbarSelectSlotAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Hotbar")
+	UInputAction* DropItemAction;
 };

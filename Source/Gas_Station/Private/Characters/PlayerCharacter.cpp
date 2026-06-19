@@ -9,6 +9,9 @@
 #include "Interfaces/InteractionInterface.h"
 #include "DrawDebugHelpers.h"
 #include "UserInterface/BurgerHUD.h"
+#include "Components/InventoryComponent.h"
+#include "Items/ItemBase.h"
+#include "World/Pickup.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -42,6 +45,10 @@ APlayerCharacter::APlayerCharacter()
 
 	InteractionCheckFrequency = 0.1f;
 	InteractionCheckDistance = 225.0f;
+
+	//inventory
+	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+	PlayerInventory->SetSlotsCapacity(8);
 }
 
 // Called when the game starts or when spawned
@@ -108,6 +115,52 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		                                   &APlayerCharacter::BeginInteract);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this,
 		                                   &APlayerCharacter::EndInteract);
+
+		EnhancedInputComponent->BindAction(HotbarScrollAction, ETriggerEvent::Triggered, this,
+		                                   &APlayerCharacter::OnHotbarScroll);
+
+		EnhancedInputComponent->BindAction(HotbarSelectSlotAction, ETriggerEvent::Triggered, this,
+		                                   &APlayerCharacter::OnHotbarSelectSlot);
+
+		EnhancedInputComponent->BindAction(DropItemAction, ETriggerEvent::Triggered, this,
+		                                   &APlayerCharacter::DropItem);
+	}
+}
+
+void APlayerCharacter::DropItem(const FInputActionValue& Value)
+{
+	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
+
+	if (DroppedItem)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation{
+			GetActorLocation() + FVector{0.f, 0.f, BaseEyeHeight - 15} + (GetActorForwardVector() * 30.0f)
+		};
+		const FTransform SpawnTransform{GetActorRotation(), SpawnLocation};
+
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+
+		//set physics true after throwing it
+		Pickup->GetStaticMeshComponent()->SetSimulatePhysics(true);
+
+		Pickup->InitializeDrop(DroppedItem);
+
+		//for the impulse
+		FVector ThrowDirection = GetActorForwardVector() + FVector(0.f, 0.f, 0.4f);
+		ThrowDirection.Normalize();
+
+		constexpr float ThrowStrength = 1000.f;
+
+		Pickup->GetStaticMeshComponent()->AddImpulse(ThrowDirection * ThrowStrength, NAME_None, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Dropped Item Not Found"));
 	}
 }
 
@@ -289,4 +342,16 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
+}
+
+void APlayerCharacter::OnHotbarScroll(const FInputActionValue& Value)
+{
+	const float AxisValue = Value.Get<float>();
+	PlayerInventory->ScrollHotbar(AxisValue > 0.f ? 1 : -1);
+}
+
+void APlayerCharacter::OnHotbarSelectSlot(const FInputActionValue& Value)
+{
+	const int32 SlotIndex = FMath::RoundToInt(Value.Get<float>()) - 1;
+	PlayerInventory->SelectSlot(SlotIndex);
 }

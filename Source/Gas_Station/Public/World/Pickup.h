@@ -29,6 +29,7 @@ public:
 	void InitializeDrop(UItemBase* ItemToDrop);
 
 	FORCEINLINE UItemBase* GetItemData() const { return ItemReference; }
+	FORCEINLINE UStaticMeshComponent* GetStaticMeshComponent() const { return PickupMesh; }
 
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;

@@ -1,8 +1,14 @@
 // YaSolo
 #include "Items/ItemBase.h"
 
-UItemBase::UItemBase()
+UItemBase::UItemBase() : bIsCopy(false), bIsPickup(false)
 {
+}
+
+void UItemBase::ResetItemFlags()
+{
+	bIsCopy = false;
+	bIsPickup = false;
 }
 
 UItemBase* UItemBase::CreateItemCopy() const
@@ -13,6 +19,7 @@ UItemBase* UItemBase::CreateItemCopy() const
 	ItemCopy->AssetData = this->AssetData;
 	ItemCopy->ItemType = this->ItemType;
 	ItemCopy->DescriptiveText = this->DescriptiveText;
+	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;
 }
