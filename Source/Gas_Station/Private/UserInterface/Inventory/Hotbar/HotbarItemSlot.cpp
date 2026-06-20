@@ -9,30 +9,40 @@ void UHotbarItemSlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ItemBorder->SetBrushColor(FLinearColor(FLinearColor::Red));
-	ItemIcon->SetVisibility(ESlateVisibility::Hidden);
+	if (!ItemBorderTexture)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Itembordertexture is null"));
+	}
+
+	// ItemBorder->SetBrushFromTexture(ItemBorderTexture);
+	// ItemBorder->SetContentColorAndOpacity(FLinearColor::White);
+
+	ItemIcon->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UHotbarItemSlot::SetItem(UItemBase* Item)
+void UHotbarItemSlot::SetItem(const UItemBase* Item) const
 {
-	ItemReference = Item;
-
-	if (Item)
+	if (Item && Item->AssetData.Icon)
 	{
-		ItemIcon->SetBrushFromTexture(Item->AssetData.Icon);
+		FSlateBrush NewBrush;
+		NewBrush.SetResourceObject(Item->AssetData.Icon);
+		NewBrush.TintColor = FSlateColor(FLinearColor::White);
+		NewBrush.DrawAs = ESlateBrushDrawType::Image;
+		NewBrush.ImageSize = FVector2D(Item->AssetData.Icon->GetSizeX(),
+		                               Item->AssetData.Icon->GetSizeY());
+
+		ItemIcon->SetBrush(NewBrush);
 		ItemIcon->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
-		ItemIcon->SetVisibility(ESlateVisibility::Hidden);
+		ItemIcon->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
 void UHotbarItemSlot::SetSelected(const bool bIsSelected) const
 {
-	const FLinearColor Color = bIsSelected
-		                           ? FLinearColor(1.f, 1.f, 1.f, 1.f) // white when selected
-		                           : FLinearColor(FLinearColor::Red); // gray when not
+	UTexture2D* Texture = bIsSelected ? SelectedItemTexture : ItemBorderTexture;
 
-	ItemBorder->SetBrushColor(Color);
+	// ItemBorder->SetBrushFromTexture(Texture);
 }

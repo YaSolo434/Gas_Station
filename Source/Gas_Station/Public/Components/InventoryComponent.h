@@ -8,7 +8,8 @@
 
 class UItemBase;
 
-DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, int32, NewSlot);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSelectedSlotChanged, int32, NewSlot);
 
 UENUM(BlueprintType)

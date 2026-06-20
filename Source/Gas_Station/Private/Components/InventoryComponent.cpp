@@ -65,14 +65,14 @@ void UInventoryComponent::AddNewItem(UItemBase* Item, int32 SlotIndex)
 	NewItem->OwningInventory = this;
 
 	InventoryContents[SlotIndex] = NewItem;
-	OnInventoryUpdated.Broadcast();
+	OnInventoryUpdated.Broadcast(SlotIndex);
 }
 
 UItemBase* UInventoryComponent::RemoveSelectedItem()
 {
 	UItemBase* ItemToRemove = InventoryContents[SelectedSlot];
 	InventoryContents[SelectedSlot] = nullptr;
-	OnInventoryUpdated.Broadcast();
+	OnInventoryUpdated.Broadcast(SelectedSlot);
 
 	return ItemToRemove;
 }

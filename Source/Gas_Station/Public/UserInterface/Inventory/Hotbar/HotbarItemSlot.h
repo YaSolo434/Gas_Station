@@ -9,30 +9,31 @@
 class UImage;
 class UBorder;
 class UItemBase;
-/**
- * 
- */
+
 UCLASS()
 class GAS_STATION_API UHotbarItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE void SetItemReference(UItemBase* ItemIn) { ItemReference = ItemIn; }
-	FORCEINLINE UItemBase* GetItemReference() const { return ItemReference; }
+	// FORCEINLINE void SetItemReference(UItemBase* ItemIn) { ItemReference = ItemIn; }
+	// FORCEINLINE UItemBase* GetItemReference() const { return ItemReference; }
 
-	void SetItem(UItemBase* Item);
+	void SetItem(const UItemBase* Item) const;
 	void SetSelected(bool bIsSelected) const;
 
 protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
-	UBorder* ItemBorder;
+	// UPROPERTY(meta = (BindWidget))
+	// UBorder* ItemBorder;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* ItemIcon;
 
-	UPROPERTY(VisibleAnywhere, Category="Hotbar Slot")
-	UItemBase* ItemReference;
+	UPROPERTY(EditDefaultsOnly, Category="Texture")
+	UTexture2D* ItemBorderTexture;
+
+	UPROPERTY(EditDefaultsOnly, Category="Texture")
+	UTexture2D* SelectedItemTexture;
 };

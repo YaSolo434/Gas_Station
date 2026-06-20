@@ -37,7 +37,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void RefreshHotbar();
+	void RefreshHotbar(const int32 NewSlot);
 
 	UFUNCTION()
 	void UpdateSelectedSlot(const int32 NewSlot);

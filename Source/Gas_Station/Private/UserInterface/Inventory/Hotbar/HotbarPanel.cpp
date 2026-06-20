@@ -15,7 +15,7 @@ void UHotbarPanel::NativeConstruct()
 		Inventory = PlayerCharacter->GetInventory();
 
 		//subscribe to channels
-		Inventory->OnInventoryUpdated.AddUObject(this, &UHotbarPanel::RefreshHotbar);
+		Inventory->OnInventoryUpdated.AddDynamic(this, &UHotbarPanel::RefreshHotbar);
 		Inventory->OnSelectedSlotChanged.AddDynamic(this, &UHotbarPanel::UpdateSelectedSlot);
 
 		for (int32 i = 0; i < Inventory->GetSlotsCapacity(); i++)
@@ -25,15 +25,13 @@ void UHotbarPanel::NativeConstruct()
 			SlotWidgets.Add(SingleSlotWidget);
 		}
 
-		RefreshHotbar();
+		// RefreshHotbar();
 		UpdateSelectedSlot(0);
 	}
 }
 
-void UHotbarPanel::RefreshHotbar()
+void UHotbarPanel::RefreshHotbar(const int32 NewSlot)
 {
-	int Number = SlotWidgets.Num();
-
 	for (int32 i = 0; i < SlotWidgets.Num(); i++)
 	{
 		SlotWidgets[i]->SetItem(Inventory->GetInventoryContents()[i]);
