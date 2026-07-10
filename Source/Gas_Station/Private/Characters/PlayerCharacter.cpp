@@ -171,8 +171,6 @@ void APlayerCharacter::PerformInteractionCheck()
 	const FVector TraceStart{GetPawnViewLocation()};
 	const FVector TraceEnd{TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance)};
 
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0, 0, 2.0f);
-
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 

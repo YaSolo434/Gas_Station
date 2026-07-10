@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "BurgerHUD.generated.h"
 
+class UItemBase;
+class UHighlightWidget;
 class UHotbarPanel;
 struct FInteractableData;
 class UInteractionWidget;
@@ -29,6 +31,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UHotbarPanel> HotbarPanelClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UHighlightWidget> HighlightWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+
 	bool bIsMenuVisible;
 
 	//=================================================================================================
@@ -43,6 +51,10 @@ public:
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
+	void ShowHighlightWidget() const;
+	void HideHighlightWidget() const;
+	void UpdateHighlightWidget(const UItemBase* SelectedItem) const;
+
 protected:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
@@ -55,6 +67,12 @@ protected:
 
 	UPROPERTY()
 	UHotbarPanel* HotbarPanelWidget;
+
+	UPROPERTY()
+	UHighlightWidget* HighlightWidget;
+
+	UPROPERTY()
+	UUserWidget* CrosshairWidget;
 
 	//=================================================================================================
 	// FUNCTIONS

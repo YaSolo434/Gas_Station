@@ -1,6 +1,7 @@
 // YaSolo
 #include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
+#include "UserInterface/BurgerHUD.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -12,6 +13,8 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	HUD = Cast<ABurgerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
 FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* ItemIn)
@@ -90,8 +93,26 @@ void UInventoryComponent::SelectSlot(const int32 Index)
 		return;
 	}
 
+	// clears the old timer
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_HighlightWidget);
+
 	SelectedSlot = New;
 	OnSelectedSlotChanged.Broadcast(SelectedSlot);
+
+	HUD->HideHighlightWidget();
+
+	if (InventoryContents[SelectedSlot])
+	{
+		HUD->UpdateHighlightWidget(InventoryContents[SelectedSlot]);
+
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_HighlightWidget,
+			HUD,
+			&ABurgerHUD::HideHighlightWidget,
+			HighlightWidgetDurationTime,
+			false
+		);
+	}
 }
 
 int32 UInventoryComponent::WrapIndex(const int32 Index) const

@@ -2,6 +2,7 @@
 #include "UserInterface/BurgerHUD.h"
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
+#include "UserInterface/Inventory/HighlightWidget.h"
 #include "UserInterface/Inventory/Hotbar/HotbarPanel.h"
 
 ABurgerHUD::ABurgerHUD()
@@ -37,8 +38,28 @@ void ABurgerHUD::BeginPlay()
 		HotbarPanelWidget = CreateWidget<UHotbarPanel>(GetWorld(), HotbarPanelClass);
 		if (HotbarPanelWidget)
 		{
-			HotbarPanelWidget->AddToViewport(-1);
+			HotbarPanelWidget->AddToViewport(4);
 			HotbarPanelWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	if (HighlightWidgetClass)
+	{
+		HighlightWidget = CreateWidget<UHighlightWidget>(GetWorld(), HighlightWidgetClass);
+		if (HighlightWidget)
+		{
+			HighlightWidget->AddToViewport(-1);
+			HighlightWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+
+	if (CrosshairWidgetClass)
+	{
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->AddToViewport(4);
+			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 }
@@ -84,5 +105,31 @@ void ABurgerHUD::UpdateInteractionWidget(const FInteractableData* InteractableDa
 	if (InteractionWidget)
 	{
 		InteractionWidget->UpdateWidget(InteractableData);
+	}
+}
+
+void ABurgerHUD::ShowHighlightWidget() const
+{
+	if (HighlightWidget)
+	{
+		HighlightWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ABurgerHUD::HideHighlightWidget() const
+{
+	if (HighlightWidget)
+	{
+		HighlightWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void ABurgerHUD::UpdateHighlightWidget(const UItemBase* SelectedItem) const
+{
+	ShowHighlightWidget();
+
+	if (HighlightWidget)
+	{
+		HighlightWidget->UpdateWidget(SelectedItem);
 	}
 }

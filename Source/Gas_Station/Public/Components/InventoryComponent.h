@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+class ABurgerHUD;
 class UItemBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, int32, NewSlot);
@@ -121,6 +122,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TArray<TObjectPtr<UItemBase>> InventoryContents;
 
+	UPROPERTY()
+	ABurgerHUD* HUD;
+
+	UPROPERTY(EditAnywhere, Category = "HighlightWidget")
+	float HighlightWidgetDurationTime = 2.0f;
+
+	FTimerHandle TimerHandle_HighlightWidget;
 
 	//=================================================================================================
 	// FUNCTIONS
