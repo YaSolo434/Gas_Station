@@ -11,7 +11,7 @@ void UHotbarItemSlot::NativeConstruct()
 
 	if (!ItemBorderTexture)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Itembordertexture is null"));
+		UE_LOG(LogTemp, Warning, TEXT("ItemBorderTexture is null"));
 	}
 
 	// ItemBorder->SetBrushFromTexture(ItemBorderTexture);
@@ -24,14 +24,15 @@ void UHotbarItemSlot::SetItem(const UItemBase* Item) const
 {
 	if (Item && Item->AssetData.Icon)
 	{
-		FSlateBrush NewBrush;
-		NewBrush.SetResourceObject(Item->AssetData.Icon);
-		NewBrush.TintColor = FSlateColor(FLinearColor::White);
-		NewBrush.DrawAs = ESlateBrushDrawType::Image;
-		NewBrush.ImageSize = FVector2D(Item->AssetData.Icon->GetSizeX(),
-		                               Item->AssetData.Icon->GetSizeY());
+		// Debug check
+		UE_LOG(LogTemp, Warning, TEXT("Icon: %s, SRGB: %d, Width: %d, Height: %d"),
+		       *Item->AssetData.Icon->GetName(),
+		       Item->AssetData.Icon->SRGB,
+		       Item->AssetData.Icon->GetSizeX(),
+		       Item->AssetData.Icon->GetSizeY());
 
-		ItemIcon->SetBrush(NewBrush);
+		ItemIcon->SetBrushFromTexture(Item->AssetData.Icon);
+		ItemIcon->SetColorAndOpacity(FLinearColor::White);
 		ItemIcon->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
@@ -44,5 +45,5 @@ void UHotbarItemSlot::SetSelected(const bool bIsSelected) const
 {
 	UTexture2D* Texture = bIsSelected ? SelectedItemTexture : ItemBorderTexture;
 
-	// ItemBorder->SetBrushFromTexture(Texture);
+	ItemBorder->SetBrushFromTexture(Texture);
 }

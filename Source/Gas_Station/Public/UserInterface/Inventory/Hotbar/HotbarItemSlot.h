@@ -25,8 +25,8 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
-	// UPROPERTY(meta = (BindWidget))
-	// UBorder* ItemBorder;
+	UPROPERTY(meta = (BindWidget))
+	UBorder* ItemBorder;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* ItemIcon;
