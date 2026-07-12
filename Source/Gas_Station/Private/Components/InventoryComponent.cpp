@@ -1,6 +1,9 @@
 // YaSolo
 #include "Components/InventoryComponent.h"
+
+#include "Characters/PlayerCharacter.h"
 #include "Items/ItemBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "UserInterface/BurgerHUD.h"
 
 // Sets default values for this component's properties
@@ -15,6 +18,8 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	HUD = Cast<ABurgerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	Player = Cast<APlayerCharacter>(GetOwner());
 }
 
 FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* ItemIn)
@@ -23,6 +28,7 @@ FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* ItemIn)
 	{
 		if (InventoryContents[SelectedSlot] == nullptr)
 		{
+			bIsAddedToSelectedSlot = true;
 			AddNewItem(ItemIn, SelectedSlot);
 			return FItemAddResult::AddedItem(FText::Format(
 				FText::FromString("Successfully added {0} to the selected slot"),
@@ -33,6 +39,7 @@ FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* ItemIn)
 		{
 			if (InventoryContents[Slot] == nullptr)
 			{
+				bIsAddedToSelectedSlot = false;
 				AddNewItem(ItemIn, Slot);
 				return FItemAddResult::AddedItem(FText::Format(
 					FText::FromString("Successfully added {0} to the hotbar"),
@@ -69,15 +76,20 @@ void UInventoryComponent::AddNewItem(UItemBase* Item, int32 SlotIndex)
 
 	InventoryContents[SlotIndex] = NewItem;
 
-	HUD->UpdateHighlightWidget(InventoryContents[SlotIndex]);
+	if (bIsAddedToSelectedSlot)
+	{
+		HUD->UpdateHighlightWidget(InventoryContents[SlotIndex]);
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_HighlightWidget,
+			HUD,
+			&ABurgerHUD::HideHighlightWidget,
+			HighlightWidgetDurationTime,
+			false
+		);
 
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_HighlightWidget,
-		HUD,
-		&ABurgerHUD::HideHighlightWidget,
-		HighlightWidgetDurationTime,
-		false
-	);
+		Player->UpdateHeldItemMesh(InventoryContents[SlotIndex]);
+	}
+
 	OnInventoryUpdated.Broadcast(SlotIndex);
 }
 
@@ -86,6 +98,8 @@ UItemBase* UInventoryComponent::RemoveSelectedItem()
 	UItemBase* ItemToRemove = InventoryContents[SelectedSlot];
 	InventoryContents[SelectedSlot] = nullptr;
 	OnInventoryUpdated.Broadcast(SelectedSlot);
+
+	Player->UpdateHeldItemMesh(InventoryContents[SelectedSlot]);
 
 	return ItemToRemove;
 }
@@ -110,6 +124,7 @@ void UInventoryComponent::SelectSlot(const int32 Index)
 	OnSelectedSlotChanged.Broadcast(SelectedSlot);
 
 	HUD->HideHighlightWidget();
+	Player->UpdateHeldItemMesh(InventoryContents[SelectedSlot]);
 
 	if (InventoryContents[SelectedSlot])
 	{

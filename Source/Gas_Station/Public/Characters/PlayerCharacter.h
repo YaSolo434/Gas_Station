@@ -9,6 +9,10 @@
 class UItemBase;
 class UInventoryComponent;
 class ABurgerHUD;
+class USpringArmComponent;
+class UInputAction;
+class UCameraComponent;
+struct FInputActionValue;
 
 USTRUCT()
 struct FInteractionData
@@ -26,11 +30,6 @@ struct FInteractionData
 	UPROPERTY()
 	float LastInteractionTime;
 };
-
-class USpringArmComponent;
-class UInputAction;
-class UCameraComponent;
-struct FInputActionValue;
 
 UCLASS()
 class GAS_STATION_API APlayerCharacter : public ACharacter
@@ -76,6 +75,34 @@ protected:
 
 	FInteractionData InteractionData;
 
+	//held item
+	UPROPERTY(VisibleAnywhere, Category = "Hold | Component")
+	USceneComponent* ItemHoldSocket;
+
+	UPROPERTY(VisibleAnywhere, Category = "Hold | Mesh")
+	UStaticMeshComponent* HeldItemMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Hold | Mesh")
+	FVector BaseHoldLocation = FVector(30.f, 15.f, -15.f);
+
+	UPROPERTY(EditAnywhere, Category = "Hold | Mesh")
+	FRotator BaseHoldRotation = FRotator(30.f, 15.f, -15.f);
+
+	UPROPERTY(EditAnywhere, Category = "Hold | Sway")
+	float LocationLagSpeed = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Hold|Sway")
+	float YawSwayScale = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Hold|Sway")
+	float PitchSwayScale = 0.3f;
+
+	UPROPERTY(EditAnywhere, Category = "Hold|Sway")
+	float MaxSwayDistance = 5.f;
+
+	FRotator LastCameraRotation;
+	FVector CurrentSwayOffset = FVector::ZeroVector;
+
 	//=================================================================================================
 	// FUNCTIONS
 	//=================================================================================================
@@ -117,6 +144,8 @@ public:
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
 
 	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
+
+	void UpdateHeldItemMesh(const UItemBase* ItemIn) const;
 
 protected:
 	//=================================================================================================

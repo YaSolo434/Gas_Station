@@ -32,6 +32,17 @@ APlayerCharacter::APlayerCharacter()
 	FirstPersonCamera->bUsePawnControlRotation = false;
 	FirstPersonCamera->FieldOfView = CameraFOV;
 
+	//Held item
+	ItemHoldSocket = CreateDefaultSubobject<USceneComponent>(TEXT("ItemHoldSocket"));
+	ItemHoldSocket->SetupAttachment(FirstPersonCamera);
+	ItemHoldSocket->SetRelativeLocation(BaseHoldLocation);
+	ItemHoldSocket->SetRelativeRotation(BaseHoldRotation);
+
+	HeldItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeldItemMesh"));
+	HeldItemMesh->SetupAttachment(ItemHoldSocket);
+	HeldItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HeldItemMesh->SetCastShadow(false);
+
 	//Set player movement settings
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->GravityScale = 2.f;
@@ -84,6 +95,21 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		PerformInteractionCheck();
 	}
+
+	const FRotator CurrentCamRot = FirstPersonCamera->GetComponentRotation();
+	const FRotator DeltaRot = (CurrentCamRot - LastCameraRotation).GetNormalized();
+
+	LastCameraRotation = CurrentCamRot;
+
+	const FVector TargetSwayLoc{
+		0.f,
+		FMath::Clamp(-DeltaRot.Yaw * YawSwayScale, -MaxSwayDistance, MaxSwayDistance),
+		FMath::Clamp(DeltaRot.Pitch * PitchSwayScale, -MaxSwayDistance, MaxSwayDistance)
+	};
+
+	CurrentSwayOffset = FMath::VInterpTo(CurrentSwayOffset, TargetSwayLoc, DeltaTime, LocationLagSpeed);
+
+	ItemHoldSocket->SetRelativeLocation(BaseHoldLocation + CurrentSwayOffset);
 }
 
 // Called to bind functionality to input
@@ -285,6 +311,19 @@ void APlayerCharacter::Interact()
 	{
 		TargetInteractable->Interact(this);
 	}
+}
+
+void APlayerCharacter::UpdateHeldItemMesh(const UItemBase* ItemIn) const
+{
+	if (!ItemIn)
+	{
+		HeldItemMesh->SetStaticMesh(nullptr);
+		return;
+	}
+
+	HeldItemMesh->SetStaticMesh(ItemIn->AssetData.Mesh);
+	HeldItemMesh->SetRelativeLocation(FVector::ZeroVector);
+	HeldItemMesh->SetRelativeRotation(FRotator::ZeroRotator);
 }
 
 void APlayerCharacter::MoveForward(const FInputActionValue& Value)

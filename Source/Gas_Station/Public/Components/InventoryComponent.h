@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+class APlayerCharacter;
 class ABurgerHUD;
 class UItemBase;
 
@@ -128,6 +129,11 @@ protected:
 	float HighlightWidgetDurationTime = 2.0f;
 
 	FTimerHandle TimerHandle_HighlightWidget;
+
+	UPROPERTY()
+	APlayerCharacter* Player;
+
+	bool bIsAddedToSelectedSlot = true;
 
 	//=================================================================================================
 	// FUNCTIONS
