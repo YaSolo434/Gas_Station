@@ -112,6 +112,7 @@ void ABurgerHUD::ShowHighlightWidget() const
 {
 	if (HighlightWidget)
 	{
+		HighlightWidget->PlayFadeIn();
 		HighlightWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
@@ -120,7 +121,7 @@ void ABurgerHUD::HideHighlightWidget() const
 {
 	if (HighlightWidget)
 	{
-		HighlightWidget->SetVisibility(ESlateVisibility::Collapsed);
+		HighlightWidget->PlayFadeOut();
 	}
 }
 

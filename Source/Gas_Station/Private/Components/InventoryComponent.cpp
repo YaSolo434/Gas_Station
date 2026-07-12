@@ -68,6 +68,16 @@ void UInventoryComponent::AddNewItem(UItemBase* Item, int32 SlotIndex)
 	NewItem->OwningInventory = this;
 
 	InventoryContents[SlotIndex] = NewItem;
+
+	HUD->UpdateHighlightWidget(InventoryContents[SlotIndex]);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_HighlightWidget,
+		HUD,
+		&ABurgerHUD::HideHighlightWidget,
+		HighlightWidgetDurationTime,
+		false
+	);
 	OnInventoryUpdated.Broadcast(SlotIndex);
 }
 

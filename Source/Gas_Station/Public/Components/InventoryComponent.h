@@ -69,18 +69,6 @@ public:
 	FOnInventoryUpdated OnInventoryUpdated;
 	FOnSelectedSlotChanged OnSelectedSlotChanged;
 
-	UPROPERTY(VisibleAnywhere, Category = "Hotbar")
-	int32 SelectedSlot = 0;
-
-	UFUNCTION()
-	void SelectSlot(const int32 Index);
-
-	UFUNCTION()
-	void ScrollHotbar(const int32 Direction);
-
-	FORCEINLINE UItemBase* GetSelectedItem() const { return InventoryContents[SelectedSlot]; }
-
-
 	//=================================================================================================
 	// FUNCTIONS
 	//=================================================================================================
@@ -111,6 +99,17 @@ public:
 	{
 		InventorySlotsCapacity = NewSlotsCapacity;
 	};
+
+	UPROPERTY(VisibleAnywhere, Category = "Hotbar")
+	int32 SelectedSlot = 0;
+
+	UFUNCTION()
+	void SelectSlot(const int32 Index);
+
+	UFUNCTION()
+	void ScrollHotbar(const int32 Direction);
+
+	FORCEINLINE UItemBase* GetSelectedItem() const { return InventoryContents[SelectedSlot]; }
 
 protected:
 	//=================================================================================================

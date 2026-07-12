@@ -16,7 +16,8 @@ public class Gas_Station : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
