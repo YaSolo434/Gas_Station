@@ -310,6 +310,8 @@ void APlayerCharacter::Interact()
 	if (IsValid(TargetInteractable.GetObject()))
 	{
 		TargetInteractable->Interact(this);
+		
+		
 	}
 }
 

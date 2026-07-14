@@ -33,6 +33,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	EItemType ItemType;
+	
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	EFoodType FoodType;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemDescriptiveTextData DescriptiveText;

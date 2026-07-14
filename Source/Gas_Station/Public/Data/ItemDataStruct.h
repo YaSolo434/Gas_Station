@@ -23,6 +23,21 @@ enum class EItemType : uint8
 	Equipment UMETA(DisplayName="Equipment"),
 };
 
+UENUM()
+enum class EFoodType : uint8
+{
+	None UMETA(DisplayName = "None"),
+	BreadBottom UMETA(DisplayName = "Bread Bottom"),
+	BreadTop UMETA(DisplayName = "Bread Top"),
+	Patty UMETA(DisplayName = "Patty"),
+	Cheese UMETA(DisplayName = "Cheese"),
+	Tomato UMETA(DisplayName = "Tomato"),
+	Lettuce UMETA(DisplayName = "Lettuce"),
+	Onion UMETA(DisplayName = "Onion"),
+	Pickle UMETA(DisplayName = "Pickle"),
+	CompletedBurger UMETA(DisplayName = "Completed Burger"),
+};
+
 USTRUCT()
 struct FItemDescriptiveTextData
 {
@@ -54,6 +69,9 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	EItemType ItemType;
+
+	UPROPERTY(EditAnywhere, Category = "ItemData", meta = (EditCondition = "ItemType == EItemType::Food", EditConditionHides))
+	EFoodType FoodType;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemDescriptiveTextData DescriptiveText;
