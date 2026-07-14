@@ -13,7 +13,8 @@ enum class EInteractableType : uint8
 {
 	Pickup UMETA(DisplayName = "Pickup"),
 	NonPlayerCharacter UMETA(DisplayName = "NonPlayerCharacter"),
-	Toggle UMETA(DisplayName = "Toggle")
+	Toggle UMETA(DisplayName = "Toggle"),
+	Device UMETA(DisplayName = "Device")
 };
 
 USTRUCT()

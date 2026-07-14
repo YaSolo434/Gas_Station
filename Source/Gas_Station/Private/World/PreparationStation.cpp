@@ -1,8 +1,12 @@
 // YaSolo
 #include "World/PreparationStation.h"
 
+#include "Characters/PlayerCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
+#include "World/CompletedBurger.h"
+#include "Data/ItemDataStruct.h"
 
 // Sets default values
 APreparationStation::APreparationStation()
@@ -11,7 +15,7 @@ APreparationStation::APreparationStation()
 	SetRootComponent(WorkSpace);
 	WorkSpace->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	WorkSpace->SetBoxExtent(FVector(50.f, 50.f, 50.f));
-	WorkSpace->SetVisibility(false);
+	WorkSpace->SetVisibility(true);
 	WorkSpace->SetHiddenInGame(true);
 }
 
@@ -19,14 +23,11 @@ APreparationStation::APreparationStation()
 void APreparationStation::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UpdateInteractableData();
 }
 
-void APreparationStation::Interact(APlayerCharacter* PlayerCharacter)
-{
-	// ?
-}
-
-bool APreparationStation::AddIngredient(UItemBase* Ingredient)
+bool APreparationStation::AddIngredient(const UItemBase* Ingredient)
 {
 	if (!CanAddIngredient(Ingredient))
 	{
@@ -44,7 +45,7 @@ bool APreparationStation::AddIngredient(UItemBase* Ingredient)
 	NewMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	NewMesh->RegisterComponent();
 
-	//Attach to socket if its not the first ingrident
+	//Attach to socket if it's not the first ingredient
 	if (IngredientCount == 0)
 	{
 		NewMesh->SetWorldLocation(CalculateFirstIngredientPosition());
@@ -55,7 +56,7 @@ bool APreparationStation::AddIngredient(UItemBase* Ingredient)
 		{
 			NewMesh->AttachToComponent(
 				LastIngredientMesh,
-				FAttachmentTransformRules::SnapToTargetIncludingScale,
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 				NextIngredientSocketName);
 		}
 	}
@@ -91,18 +92,6 @@ bool APreparationStation::CanAddIngredient(const UItemBase* Ingredient) const
 	return true;
 }
 
-void APreparationStation::PickupCompletedBurger(APlayerCharacter* PlayerCharacter)
-{
-	if (!bIsComplete || !PlayerCharacter)
-	{
-		return;
-	}
-
-	ClearAssembly();
-
-	// TODO: Spawn pickup with CompletedBurger item
-}
-
 FVector APreparationStation::CalculateFirstIngredientPosition() const
 {
 	//Get box center and half extends
@@ -122,7 +111,68 @@ void APreparationStation::UpdateAssemblyState(const UItemBase* Ingredient)
 	{
 		bHasTopBread = true;
 		bIsComplete = true;
+		OnAssemblyComplete();
 	}
+}
+
+void APreparationStation::OnAssemblyComplete()
+{
+	// store the old assembled mesh
+	TArray<UStaticMesh*> IngredientMeshes;
+
+	for (const UStaticMeshComponent* Mesh : AssembledMeshes)
+	{
+		if (Mesh && Mesh->GetStaticMesh())
+		{
+			IngredientMeshes.Add(Mesh->GetStaticMesh());
+		}
+	}
+
+	//clear the old assembled mesh
+	ClearAssembly();
+
+	//Spawn new completed mesh
+	FVector SpawnLocation = CalculateFirstIngredientPosition();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	ACompletedBurger* Burger = GetWorld()->SpawnActor<ACompletedBurger>(
+		CompletedBurgerClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+	if (Burger)
+	{
+		//setup burger item data for interaction and so on
+		if (ItemDataTable && !DesiredItemID.IsNone())
+		{
+			const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(
+				DesiredItemID, DesiredItemID.ToString());
+
+			if (ItemData)
+			{
+				Burger->ItemReference = NewObject<UItemBase>(Burger);
+				Burger->ItemReference->ID = ItemData->ID;
+				Burger->ItemReference->ItemType = ItemData->ItemType;
+				Burger->ItemReference->FoodType = ItemData->FoodType;
+				Burger->ItemReference->DescriptiveText = ItemData->DescriptiveText;
+				Burger->ItemReference->AssetData = ItemData->AssetData;
+				Burger->UpdateInteractableData();
+			}
+		}
+
+		//add ingredient meshes to burger
+		for (UStaticMesh* Mesh : IngredientMeshes)
+		{
+			Burger->AddIngredientMesh(Mesh);
+		}
+	}
+
+	// reset workstation state
+	bHasBottomBread = false;
+	bHasTopBread = false;
+	bIsComplete = false;
+	IngredientCount = 0;
+
+	UpdateInteractableData();
 }
 
 void APreparationStation::ClearAssembly()
@@ -135,10 +185,6 @@ void APreparationStation::ClearAssembly()
 		}
 	}
 	AssembledMeshes.Empty();
-	IngredientCount = 0;
-	bIsComplete = false;
-	bHasBottomBread = false;
-	bHasTopBread = false;
 }
 
 bool APreparationStation::IsBreadBottom(const UItemBase* Ingredient) const
@@ -149,4 +195,60 @@ bool APreparationStation::IsBreadBottom(const UItemBase* Ingredient) const
 bool APreparationStation::IsBreadTop(const UItemBase* Ingredient) const
 {
 	return Ingredient && Ingredient->FoodType == EFoodType::BreadTop;
+}
+
+void APreparationStation::Interact(APlayerCharacter* PlayerCharacter)
+{
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	// if complete do noting player should handle it
+	if (bIsComplete)
+	{
+		return;
+	}
+
+	UInventoryComponent* PlayerInventory = PlayerCharacter->GetInventory();
+
+	if (PlayerInventory)
+	{
+		UItemBase* HeldItem = PlayerInventory->GetSelectedItem();
+
+		if (HeldItem && HeldItem->ItemType == EItemType::Food)
+		{
+			if (AddIngredient(HeldItem))
+			{
+				PlayerInventory->RemoveSelectedItem();
+			}
+		}
+	}
+}
+
+void APreparationStation::UpdateInteractableData()
+{
+	if (bIsComplete)
+	{
+		InstanceInteractableData.InteractableType = EInteractableType::Pickup;
+		InstanceInteractableData.Name = FText::FromString("Completed Burger");
+		InstanceInteractableData.Action = FText::FromString("Pick up");
+		InstanceInteractableData.InteractionDuration = 0.f;
+	}
+	else
+	{
+		InstanceInteractableData.InteractableType = EInteractableType::Device;
+		InstanceInteractableData.Name = FText::FromString("Table");
+		InstanceInteractableData.Action = FText::FromString("Add Ingredient to");
+	}
+
+	InteractableData = InstanceInteractableData;
+}
+
+void APreparationStation::BeginFocus()
+{
+}
+
+void APreparationStation::EndFocus()
+{
 }

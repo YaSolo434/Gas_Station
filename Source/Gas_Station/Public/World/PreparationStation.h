@@ -7,6 +7,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "PreparationStation.generated.h"
 
+class ACompletedBurger;
 class UItemBase;
 class UBoxComponent;
 
@@ -47,22 +48,34 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Assembly | Sockets")
 	FName NextIngredientSocketName = "NextIngredient_Socket";
 
+	UPROPERTY(EditAnywhere, Category = "Assembly")
+	TSubclassOf<ACompletedBurger> CompletedBurgerClass;
+
+	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Database")
+	UDataTable* ItemDataTable;
+
+	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Database")
+	FName DesiredItemID;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Pickup | Item Database")
+	FInteractableData InstanceInteractableData;
+
 	//=================================================================================================                                                                                                                                 
 	// FUNCTIONS                                                                                                                                                                                                                        
 	//=================================================================================================
 	virtual void BeginPlay() override;
 
+	// Interaction Interface
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
+	virtual void BeginFocus() override;
+	virtual void EndFocus() override;
 
 	//Assembly func
 	UFUNCTION(Category = "Assembly")
-	bool AddIngredient(UItemBase* Ingredient);
+	bool AddIngredient(const UItemBase* Ingredient);
 
 	UFUNCTION(Category = "Assembly")
-	void ClearAssembly()
-
-	UFUNCTION(Category = "Assembly")
-	void PickupCompletedBurger(APlayerCharacter* PlayerCharacter);
+	void ClearAssembly();
 
 	UFUNCTION(Category = "Assembly")
 	bool CanAddIngredient(const UItemBase* Ingredient) const;
@@ -73,6 +86,8 @@ protected:
 private:
 	FVector CalculateFirstIngredientPosition() const;
 	void UpdateAssemblyState(const UItemBase* Ingredient);
+	void UpdateInteractableData();
+	void OnAssemblyComplete();
 	bool IsBreadBottom(const UItemBase* Ingredient) const;
 	bool IsBreadTop(const UItemBase* Ingredient) const;
 	UStaticMeshComponent* GetLastPlacedMesh() const;

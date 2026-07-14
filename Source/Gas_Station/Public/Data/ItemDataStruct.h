@@ -32,6 +32,7 @@ enum class EFoodType : uint8
 	Patty UMETA(DisplayName = "Patty"),
 	Cheese UMETA(DisplayName = "Cheese"),
 	Tomato UMETA(DisplayName = "Tomato"),
+	Meat UMETA(DisplayName = "Meat"),
 	Lettuce UMETA(DisplayName = "Lettuce"),
 	Onion UMETA(DisplayName = "Onion"),
 	Pickle UMETA(DisplayName = "Pickle"),

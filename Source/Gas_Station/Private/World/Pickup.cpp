@@ -31,6 +31,10 @@ void APickup::InitializePickup(const TSubclassOf<UItemBase> BaseClass)
 		ItemReference->ItemType = ItemData->ItemType;
 		ItemReference->DescriptiveText = ItemData->DescriptiveText;
 		ItemReference->AssetData = ItemData->AssetData;
+		if (ItemReference->ItemType == EItemType::Food)
+		{
+			ItemReference->FoodType = ItemData->FoodType;
+		}
 
 		PickupMesh->SetStaticMesh(ItemData->AssetData.Mesh);
 
