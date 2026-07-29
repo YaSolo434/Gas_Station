@@ -18,7 +18,8 @@ UENUM(BlueprintType)
 enum class EItemAddResult : uint8
 {
 	IAR_NoItemAdded UMETA(DisplayName = "No item added"),
-	IAR_AllItemAdded UMETA(DisplayName = "All of item added")
+	IAR_AllItemAdded UMETA(DisplayName = "All of item added"),
+	IAR_ItemAddedToSelectedSlot UMETA(DisplayName = "Item added to selected slot")
 };
 
 USTRUCT(BlueprintType)
@@ -29,7 +30,7 @@ struct FItemAddResult
 	FItemAddResult() : OperationResult(EItemAddResult::IAR_NoItemAdded),
 	                   ResultMessage(FText::GetEmpty())
 	{
-	};
+	}
 
 	// Enum representing the end state of an add item operation
 	UPROPERTY(BlueprintReadOnly, Category = "Item add result")
@@ -46,7 +47,7 @@ struct FItemAddResult
 		AddNoneResult.ResultMessage = ErrorText;
 
 		return AddNoneResult;
-	};
+	}
 
 	static FItemAddResult AddedItem(const FText& MessageText)
 	{
@@ -55,7 +56,16 @@ struct FItemAddResult
 		AddResult.ResultMessage = MessageText;
 
 		return AddResult;
-	};
+	}
+
+	static FItemAddResult AddedToSelectedSlot(const FText& MessageText)
+	{
+		FItemAddResult AddResult;
+		AddResult.OperationResult = EItemAddResult::IAR_ItemAddedToSelectedSlot;
+		AddResult.ResultMessage = MessageText;
+
+		return AddResult;
+	}
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

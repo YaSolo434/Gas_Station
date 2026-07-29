@@ -1,6 +1,7 @@
 // YaSolo
 #include "World/PreparationStation.h"
 
+#include "SNegativeActionButton.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/InventoryComponent.h"
@@ -84,7 +85,7 @@ bool APreparationStation::CanAddIngredient(const UItemBase* Ingredient) const
 	{
 		return false;
 	}
-	if (Ingredient->ItemType != EItemType::Food)
+	if (IngredientCount == 0 && Ingredient->FoodType != EFoodType::BreadBottom)
 	{
 		return false;
 	}
@@ -132,7 +133,7 @@ void APreparationStation::OnAssemblyComplete()
 	ClearAssembly();
 
 	//Spawn new completed mesh
-	FVector SpawnLocation = CalculateFirstIngredientPosition();
+	const FVector SpawnLocation = CalculateFirstIngredientPosition();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -199,11 +200,6 @@ bool APreparationStation::IsBreadTop(const UItemBase* Ingredient) const
 
 void APreparationStation::Interact(APlayerCharacter* PlayerCharacter)
 {
-	if (!PlayerCharacter)
-	{
-		return;
-	}
-
 	// if complete do noting player should handle it
 	if (bIsComplete)
 	{
@@ -216,7 +212,7 @@ void APreparationStation::Interact(APlayerCharacter* PlayerCharacter)
 	{
 		UItemBase* HeldItem = PlayerInventory->GetSelectedItem();
 
-		if (HeldItem && HeldItem->ItemType == EItemType::Food)
+		if (HeldItem && HeldItem->ItemType == EItemType::Food && HeldItem->FoodType != EFoodType::None)
 		{
 			if (AddIngredient(HeldItem))
 			{

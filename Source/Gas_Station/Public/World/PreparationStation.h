@@ -11,6 +11,13 @@ class ACompletedBurger;
 class UItemBase;
 class UBoxComponent;
 
+UENUM()
+enum class EIngredientAddResult : uint8
+{
+	IAR_IngredientAdded UMETA(DisplayName = "Ingredient Added"),
+	IAR_FirstIngredientIsNotBread UMETA(DisplayName = "First Ingredient is not bottom bread")
+};
+
 UCLASS()
 class GAS_STATION_API APreparationStation : public AActor, public IInteractionInterface
 {

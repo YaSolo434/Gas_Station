@@ -1,10 +1,18 @@
 // YaSolo
 #include "World/CompletedBurger.h"
 
+#include "Components/BoxComponent.h"
+
 ACompletedBurger::ACompletedBurger()
 {
-	IngredientContainer = CreateDefaultSubobject<USceneComponent>("IngredientContainer");
-	IngredientContainer->SetupAttachment(RootComponent);
+	// Container for ingredient meshes                                                                                                                                                                                                  
+	IngredientContainer = CreateDefaultSubobject<UBoxComponent>(TEXT("IngredientContainer"));
+	IngredientContainer->SetBoxExtent(FVector(25.0f, 25.0f, 25.0f));
+	IngredientContainer->SetCollisionProfileName(TEXT("BlocAllDynamic"));
+	SetRootComponent(IngredientContainer);
+
+	PickupMesh->SetupAttachment(IngredientContainer);
+	PickupMesh->SetVisibility(false);
 }
 
 void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
@@ -17,29 +25,32 @@ void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
 	UStaticMeshComponent* NewMesh = NewObject<UStaticMeshComponent>(this);
 	NewMesh->SetStaticMesh(Mesh);
 	NewMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	NewMesh->SetupAttachment(IngredientContainer);
 	NewMesh->RegisterComponent();
 
-	IngredientMeshes.Add(NewMesh);
-
-	// stack ingredient meshes vertically
-	float HeightOffset = 0.f;
-	for (const UStaticMeshComponent* ExistingMesh : IngredientMeshes)
+	if (IngredientMeshes.Num() == 0)
 	{
-		if (ExistingMesh && ExistingMesh != NewMesh)
-		{
-			FBoxSphereBounds Bounds = ExistingMesh->GetStaticMesh()->GetBounds();
-			HeightOffset += Bounds.GetBox().GetSize().Z;
-		}
+		// First ingredient attaches directly to the container
+		NewMesh->AttachToComponent(
+			IngredientContainer,
+			FAttachmentTransformRules::KeepRelativeTransform);
+		NewMesh->SetRelativeLocation(FVector::ZeroVector);
+	}
+	else
+	{
+		// Subsequent ingredients snap to the previous mesh's socket
+		UStaticMeshComponent* LastMesh = IngredientMeshes.Last();
+
+		NewMesh->AttachToComponent(
+			LastMesh,
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			NextIngredientSocketName);
 	}
 
-	NewMesh->SetRelativeLocation(FVector(0.f, 0.f, HeightOffset));
+	IngredientMeshes.Add(NewMesh);
 }
 
 void ACompletedBurger::BeginFocus()
 {
-	Super::BeginFocus();
-
 	for (UStaticMeshComponent* Mesh : IngredientMeshes)
 	{
 		if (Mesh)
@@ -51,8 +62,6 @@ void ACompletedBurger::BeginFocus()
 
 void ACompletedBurger::EndFocus()
 {
-	Super::EndFocus();
-
 	for (UStaticMeshComponent* Mesh : IngredientMeshes)
 	{
 		if (Mesh)

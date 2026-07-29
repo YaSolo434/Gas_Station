@@ -3,7 +3,6 @@
 
 #include "Characters/PlayerCharacter.h"
 #include "Items/ItemBase.h"
-#include "Kismet/GameplayStatics.h"
 #include "UserInterface/BurgerHUD.h"
 
 // Sets default values for this component's properties
@@ -30,7 +29,7 @@ FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* ItemIn)
 		{
 			bIsAddedToSelectedSlot = true;
 			AddNewItem(ItemIn, SelectedSlot);
-			return FItemAddResult::AddedItem(FText::Format(
+			return FItemAddResult::AddedToSelectedSlot(FText::Format(
 				FText::FromString("Successfully added {0} to the selected slot"),
 				ItemIn->DescriptiveText.DisplayName));
 		}

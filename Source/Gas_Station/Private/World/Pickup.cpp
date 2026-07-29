@@ -100,6 +100,9 @@ void APickup::TakePickup(const APlayerCharacter* Taker)
 				case EItemAddResult::IAR_AllItemAdded:
 					Destroy();
 					break;
+				case EItemAddResult::IAR_ItemAddedToSelectedSlot:
+					Destroy();
+					break;
 				}
 
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *AddResult.ResultMessage.ToString());

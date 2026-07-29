@@ -6,6 +6,8 @@
 #include "World/Pickup.h"
 #include "CompletedBurger.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class GAS_STATION_API ACompletedBurger : public APickup
 {
@@ -24,5 +26,8 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	TObjectPtr<USceneComponent> IngredientContainer;
+	TObjectPtr<UBoxComponent> IngredientContainer;
+
+	UPROPERTY(EditAnywhere, Category = "Assembly | Sockets")
+	FName NextIngredientSocketName = "NextIngredient_Socket";
 };
