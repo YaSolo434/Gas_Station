@@ -147,6 +147,8 @@ public:
 
 	void UpdateHeldItemMesh(const UItemBase* ItemIn) const;
 
+	void RemoveSelectedItem();
+
 protected:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES

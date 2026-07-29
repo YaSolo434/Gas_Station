@@ -194,6 +194,24 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 	}
 }
 
+void APlayerCharacter::RemoveSelectedItem()
+{
+	if (UItemBase* RemovedItem = PlayerInventory->RemoveSelectedItem())
+	{
+		//delete the old completed burger mesh from hand(if theres any)
+		TArray<USceneComponent*> AllDescendants;
+		ItemHoldSocket->GetChildrenComponents(true, AllDescendants);
+
+		for (const auto Child : AllDescendants)
+		{
+			if (Child != HeldItemMesh)
+			{
+				Child->DestroyComponent(true);
+			}
+		}
+	}
+}
+
 void APlayerCharacter::PerformInteractionCheck()
 {
 	InteractionData.LastInteractionTime = GetWorld()->GetTimeSeconds();
@@ -330,6 +348,7 @@ void APlayerCharacter::UpdateHeldItemMesh(const UItemBase* ItemIn) const
 			Child->DestroyComponent(true);
 		}
 	}
+
 	HeldItemMesh->SetStaticMesh(nullptr);
 
 	if (!ItemIn)
@@ -367,6 +386,7 @@ void APlayerCharacter::UpdateHeldItemMesh(const UItemBase* ItemIn) const
 		HeldItemMesh->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 }
+
 
 void APlayerCharacter::MoveForward(const FInputActionValue& Value)
 {
