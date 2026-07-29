@@ -20,6 +20,8 @@ UItemBase* UItemBase::CreateItemCopy() const
 	ItemCopy->ItemType = this->ItemType;
 	ItemCopy->DescriptiveText = this->DescriptiveText;
 	ItemCopy->FoodType = this->FoodType;
+	ItemCopy->IngredientMeshes = this->IngredientMeshes;
+	ItemCopy->bHasIngredientMeshes = this->bHasIngredientMeshes;
 	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;

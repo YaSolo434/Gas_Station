@@ -155,6 +155,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::DropItem(const FInputActionValue& Value)
 {
+	if (PlayerInventory->GetSelectedItem()->bHasIngredientMeshes)
+	{
+		return;
+	}
 	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
 
 	if (DroppedItem)
@@ -315,15 +319,53 @@ void APlayerCharacter::Interact()
 
 void APlayerCharacter::UpdateHeldItemMesh(const UItemBase* ItemIn) const
 {
+	//delete the old completed burger mesh from hand(if theres any)
+	TArray<USceneComponent*> AllDescendants;
+	ItemHoldSocket->GetChildrenComponents(true, AllDescendants);
+
+	for (const auto Child : AllDescendants)
+	{
+		if (Child != HeldItemMesh)
+		{
+			Child->DestroyComponent(true);
+		}
+	}
+	HeldItemMesh->SetStaticMesh(nullptr);
+
 	if (!ItemIn)
 	{
-		HeldItemMesh->SetStaticMesh(nullptr);
 		return;
 	}
 
-	HeldItemMesh->SetStaticMesh(ItemIn->AssetData.Mesh);
-	HeldItemMesh->SetRelativeLocation(FVector::ZeroVector);
-	HeldItemMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	if (ItemIn->bHasIngredientMeshes)
+	{
+		UStaticMeshComponent* PreviousSM = nullptr;
+		for (int32 i = 0; i < ItemIn->IngredientMeshes.Num(); i++)
+		{
+			UStaticMeshComponent* CurrentSM = NewObject<UStaticMeshComponent>(ItemHoldSocket);
+			CurrentSM->SetStaticMesh(ItemIn->IngredientMeshes[i]);
+			CurrentSM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			CurrentSM->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+			CurrentSM->RegisterComponent();
+
+			if (i == 0)
+			{
+				CurrentSM->AttachToComponent(ItemHoldSocket, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			}
+			else
+			{
+				CurrentSM->AttachToComponent(PreviousSM, FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+				                             "NextIngredient_Socket");
+			}
+			PreviousSM = CurrentSM;
+		}
+	}
+	else
+	{
+		HeldItemMesh->SetStaticMesh(ItemIn->AssetData.Mesh);
+		HeldItemMesh->SetRelativeLocation(FVector::ZeroVector);
+		HeldItemMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	}
 }
 
 void APlayerCharacter::MoveForward(const FInputActionValue& Value)

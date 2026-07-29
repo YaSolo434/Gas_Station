@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <ThirdParty/hlslcc/hlslcc/src/hlslcc_lib/ir.h>
-
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Data/ItemDataStruct.h"
@@ -33,15 +31,20 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	EItemType ItemType;
-	
+
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	EFoodType FoodType;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemDescriptiveTextData DescriptiveText;
 
+	UPROPERTY()
+	TArray<TObjectPtr<UStaticMesh>> IngredientMeshes;
+
 	bool bIsCopy;
 	bool bIsPickup;
+
+	bool bHasIngredientMeshes = false;
 
 	//=================================================================================================
 	// FUNCTIONS

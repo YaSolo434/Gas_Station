@@ -156,6 +156,14 @@ void APreparationStation::OnAssemblyComplete()
 				Burger->ItemReference->FoodType = ItemData->FoodType;
 				Burger->ItemReference->DescriptiveText = ItemData->DescriptiveText;
 				Burger->ItemReference->AssetData = ItemData->AssetData;
+
+				Burger->ItemReference->IngredientMeshes.Empty();
+				for (UStaticMesh* Mesh : IngredientMeshes)
+				{
+					Burger->ItemReference->IngredientMeshes.Add(Mesh);
+				}
+				Burger->ItemReference->bHasIngredientMeshes = true;
+
 				Burger->UpdateInteractableData();
 			}
 		}
