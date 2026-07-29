@@ -2,6 +2,7 @@
 #include "World/CompletedBurger.h"
 
 #include "Components/BoxComponent.h"
+#include "World/PreparationStation.h"
 
 ACompletedBurger::ACompletedBurger()
 {
@@ -33,7 +34,7 @@ void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
 		NewMesh->AttachToComponent(
 			IngredientContainer,
 			FAttachmentTransformRules::KeepRelativeTransform);
-		NewMesh->SetRelativeLocation(FVector::ZeroVector);
+		NewMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -10.f));
 	}
 	else
 	{
