@@ -140,6 +140,10 @@ void APreparationStation::OnAssemblyComplete()
 	ACompletedBurger* Burger = GetWorld()->SpawnActor<ACompletedBurger>(
 		CompletedBurgerClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 
+	const float BoxCompOffset = Burger->GetComponentsBoundingBox().GetExtent().Z;
+
+	Burger->SetActorLocation(SpawnLocation + FVector(0.f, 0.f, BoxCompOffset));
+
 	if (Burger)
 	{
 		//setup burger item data for interaction and so on

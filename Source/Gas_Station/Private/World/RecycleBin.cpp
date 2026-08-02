@@ -50,7 +50,6 @@ void ARecycleBin::UpdateInteractableData()
 	InstanceInteractableData.InteractableType = EInteractableType::Device;
 	InstanceInteractableData.Action = FText::FromString("Delete Item from");
 	InstanceInteractableData.Name = FText::FromString("Inventory");
-	InstanceInteractableData.InteractionDuration = InteractionDuration;
 
 	InteractableData = InstanceInteractableData;
 }

@@ -24,9 +24,6 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Pickup | Interaction")
 	FInteractableData InstanceInteractableData;
 
-	UPROPERTY(EditAnywhere, Category = "Pickup | Interaction")
-	float InteractionDuration;
-
 	//=================================================================================================                                                                                                                                 
 	// FUNCTIONS                                                                                                                                                                                                                        
 	//=================================================================================================

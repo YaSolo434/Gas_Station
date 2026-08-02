@@ -194,9 +194,9 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::RemoveSelectedItem()
+void APlayerCharacter::RemoveSelectedItem() const
 {
-	if (UItemBase* RemovedItem = PlayerInventory->RemoveSelectedItem())
+	if (PlayerInventory->RemoveSelectedItem())
 	{
 		//delete the old completed burger mesh from hand(if theres any)
 		TArray<USceneComponent*> AllDescendants;

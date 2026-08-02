@@ -147,7 +147,7 @@ public:
 
 	void UpdateHeldItemMesh(const UItemBase* ItemIn) const;
 
-	void RemoveSelectedItem();
+	void RemoveSelectedItem() const;
 
 protected:
 	//=================================================================================================

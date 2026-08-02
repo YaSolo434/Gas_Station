@@ -34,7 +34,7 @@ void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
 		NewMesh->AttachToComponent(
 			IngredientContainer,
 			FAttachmentTransformRules::KeepRelativeTransform);
-		NewMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -10.f));
+		NewMesh->SetRelativeLocation(FVector(0.f, 0.f, -this->GetComponentsBoundingBox().GetExtent().Z));
 	}
 	else
 	{
@@ -45,6 +45,12 @@ void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
 			LastMesh,
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 			NextIngredientSocketName);
+	}
+
+	//Scale up the burger container extend as the burger grows
+	if (IngredientMeshes.Num() != 0 && IngredientMeshes.Num() % 5 == 0)
+	{
+		IngredientContainer->SetBoxExtent(IngredientContainer->GetUnscaledBoxExtent() + FVector(0.f, 0.f, 10.f));
 	}
 
 	IngredientMeshes.Add(NewMesh);
