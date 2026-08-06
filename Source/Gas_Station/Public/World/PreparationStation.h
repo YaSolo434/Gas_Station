@@ -7,6 +7,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "PreparationStation.generated.h"
 
+enum class EFoodType : uint8;
 class ACompletedBurger;
 class UItemBase;
 class UBoxComponent;
@@ -66,6 +67,9 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Pickup | Item Database")
 	FInteractableData InstanceInteractableData;
+
+	UPROPERTY()
+	TArray<EFoodType> AssembledIngredientTypes;
 
 	//=================================================================================================                                                                                                                                 
 	// FUNCTIONS                                                                                                                                                                                                                        

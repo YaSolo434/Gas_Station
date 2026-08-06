@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 	FItemDescriptiveTextData DescriptiveText;
 
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	TArray<EFoodType> IngredientTypes;
+
 	UPROPERTY()
 	TArray<TObjectPtr<UStaticMesh>> IngredientMeshes;
 

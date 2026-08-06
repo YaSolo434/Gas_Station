@@ -1,7 +1,6 @@
 // YaSolo
 #include "World/PreparationStation.h"
 
-#include "SNegativeActionButton.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/InventoryComponent.h"
@@ -62,6 +61,7 @@ bool APreparationStation::AddIngredient(const UItemBase* Ingredient)
 		}
 	}
 
+	AssembledIngredientTypes.Add(Ingredient->FoodType);
 	AssembledMeshes.Add(NewMesh);
 	IngredientCount++;
 
@@ -160,6 +160,7 @@ void APreparationStation::OnAssemblyComplete()
 				Burger->ItemReference->FoodType = ItemData->FoodType;
 				Burger->ItemReference->DescriptiveText = ItemData->DescriptiveText;
 				Burger->ItemReference->AssetData = ItemData->AssetData;
+				Burger->ItemReference->IngredientTypes = AssembledIngredientTypes;
 
 				Burger->ItemReference->IngredientMeshes.Empty();
 				for (UStaticMesh* Mesh : IngredientMeshes)
@@ -184,6 +185,7 @@ void APreparationStation::OnAssemblyComplete()
 	bHasTopBread = false;
 	bIsComplete = false;
 	IngredientCount = 0;
+	AssembledIngredientTypes.Empty();
 
 	UpdateInteractableData();
 }

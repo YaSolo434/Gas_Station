@@ -2,6 +2,7 @@
 #include "World/CompletedBurger.h"
 
 #include "Components/BoxComponent.h"
+#include "QuestSystem/OrderSubSystem.h"
 #include "World/PreparationStation.h"
 
 ACompletedBurger::ACompletedBurger()
@@ -48,12 +49,25 @@ void ACompletedBurger::AddIngredientMesh(UStaticMesh* Mesh)
 	}
 
 	//Scale up the burger container extend as the burger grows
-	if (IngredientMeshes.Num() != 0 && IngredientMeshes.Num() % 5 == 0)
+	if (IngredientMeshes.Num() > 5 && IngredientMeshes.Num() % 5 == 0)
 	{
 		IngredientContainer->SetBoxExtent(IngredientContainer->GetUnscaledBoxExtent() + FVector(0.f, 0.f, 10.f));
 	}
 
 	IngredientMeshes.Add(NewMesh);
+}
+
+void ACompletedBurger::ServeToCustomer(FGuid OrderID)
+{
+	if (ItemReference)
+	{
+		if (UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>())
+		{
+			bool bWasCorrect = OrderSubSystem->SubmitBurger(OrderID, ItemReference);
+
+			//TODO: the removal of the item
+		}
+	}
 }
 
 void ACompletedBurger::BeginFocus()

@@ -30,4 +30,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Assembly | Sockets")
 	FName NextIngredientSocketName = "NextIngredient_Socket";
+
+	void ServeToCustomer(FGuid OrderID);
 };
