@@ -53,8 +53,7 @@ FCustomerOrder UOrderSubSystem::GenerateRandomOrder()
 
 	FCustomerOrder Order;
 	Order.OrderID = FGuid::NewGuid();
-	Order.MaxTime = FMath::RandRange(45.f, 90.f);
-	Order.TimeRemaining = Order.MaxTime;
+	Order.TimeRemaining = FMath::RandRange(Order.MinTime, Order.MaxTime);
 
 
 	Order.Recipe.Ingredients.Add(EFoodType::BreadBottom, 1);
@@ -125,7 +124,7 @@ bool UOrderSubSystem::SubmitBurger(FGuid OrderID, UItemBase* ItemIn)
 void UOrderSubSystem::ExpireOrder(FCustomerOrder& Order)
 {
 	Score -= PointsLostPerWrongOrder;
-	Score = FMath::Max(Score, 0);
+	Score = FMath::Max(Score, -20);
 
 	OnOrderResult.Broadcast(Order, false);
 	OnScoreChanged.Broadcast(Score);

@@ -113,7 +113,7 @@ void UOrderWidget::UpdateOrderWidgetVisibility()
 		{
 			if (UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>())
 			{
-				if (OrderSubSystem->GetActiveOrders().Num() >= 1)
+				if (OrderContainer->GetAllChildren().Num() >= 1)
 				{
 					HUD->ShowOrderWidget();
 				}

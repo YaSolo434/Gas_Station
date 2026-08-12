@@ -156,15 +156,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::DropItem(const FInputActionValue& Value)
 {
+	if (!PlayerInventory->GetSelectedItem())
+	{
+		return;
+	}
 	if (PlayerInventory->GetSelectedItem()->bHasIngredientMeshes)
 	{
 		return;
 	}
 
 	UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
-	OrderSubSystem->GenerateRandomOrder();
-	OrderSubSystem->GenerateRandomOrder();
-	OrderSubSystem->GenerateRandomOrder();
 	OrderSubSystem->GenerateRandomOrder();
 
 	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
