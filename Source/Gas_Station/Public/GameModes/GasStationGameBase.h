@@ -4,9 +4,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "GasStationGameBase.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class GAS_STATION_API AGasStationGameBase : public AGameModeBase
 {
@@ -14,4 +11,10 @@ class GAS_STATION_API AGasStationGameBase : public AGameModeBase
 
 public:
 	AGasStationGameBase();
+
+	UPROPERTY(EditAnywhere, Category = "Orders")
+	UDataTable* ItemTable;
+
+protected:
+	virtual void BeginPlay() override;
 };

@@ -8,23 +8,7 @@ void UOrderSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	if (!ItemTable)
-	{
-		return;
-	}
-
-	TArray<FItemData*> Rows;
-	ItemTable->GetAllRows<FItemData>(TEXT("OrderSubSystem::Initialize"), Rows);
-
-	for (const FItemData* Row : Rows)
-	{
-		if (Row->ItemType == EItemType::Food &&
-			Row->FoodType != EFoodType::None &&
-			Row->FoodType != EFoodType::CompletedBurger)
-		{
-			FoodTypeLookup.Add(Row->FoodType, *Row);
-		}
-	}
+	SetItemTable(ItemTable);
 }
 
 void UOrderSubSystem::Tick(float DeltaTime)
@@ -42,8 +26,31 @@ void UOrderSubSystem::Tick(float DeltaTime)
 	}
 }
 
+void UOrderSubSystem::SetItemTable(const UDataTable* InItemTable)
+{
+	FoodTypeLookup.Empty();
+
+	if (InItemTable)
+	{
+		TArray<FItemData*> Rows;
+		InItemTable->GetAllRows<FItemData>(TEXT("OrderSubSystem::SetItemTable"), Rows);
+
+		for (const FItemData* Row : Rows)
+		{
+			if (Row->ItemType == EItemType::Food &&
+				Row->FoodType != EFoodType::None &&
+				Row->FoodType != EFoodType::CompletedBurger)
+			{
+				FoodTypeLookup.Add(Row->FoodType, *Row);
+			}
+		}
+	}
+}
+
 FCustomerOrder UOrderSubSystem::GenerateRandomOrder()
 {
+	UE_LOG(LogTemp, Warning, TEXT("GenerateRandomOrder()"));
+
 	FCustomerOrder Order;
 	Order.OrderID = FGuid::NewGuid();
 	Order.MaxTime = FMath::RandRange(45.f, 90.f);

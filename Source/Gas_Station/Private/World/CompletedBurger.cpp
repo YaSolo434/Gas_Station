@@ -65,7 +65,7 @@ void ACompletedBurger::ServeToCustomer(FGuid OrderID)
 		{
 			bool bWasCorrect = OrderSubSystem->SubmitBurger(OrderID, ItemReference);
 
-			//TODO: the removal of the item
+			//TODO: the removal of the item and ui shit
 		}
 	}
 }

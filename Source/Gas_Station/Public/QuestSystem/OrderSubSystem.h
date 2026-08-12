@@ -8,6 +8,7 @@
 #include "OrderSubSystem.generated.h"
 
 class UItemBase;
+class UDataTable;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOrderSpawned, const FCustomerOrder&, Order);
 
@@ -47,9 +48,13 @@ public:
 
 	bool SubmitBurger(FGuid OrderID, UItemBase* ItemIn);
 
-	const FItemData* GetFoodItemData(EFoodType FoodType) const { return FoodTypeLookup.Find(FoodType); }
+	const FItemData* GetFoodItemData(const EFoodType FoodType) const { return FoodTypeLookup.Find(FoodType); }
 
 	int32 GetScore() const { return Score; }
+
+	void SetItemTable(const UDataTable* InItemTable);
+
+	const TArray<FCustomerOrder>& GetActiveOrders() const { return ActiveOrders; }
 
 protected:
 	UPROPERTY()

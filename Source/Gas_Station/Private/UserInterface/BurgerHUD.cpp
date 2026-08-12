@@ -4,6 +4,7 @@
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/Inventory/HighlightWidget.h"
 #include "UserInterface/Inventory/Hotbar/HotbarPanel.h"
+#include "UserInterface/QuestSystem/OrderWidget.h"
 
 ABurgerHUD::ABurgerHUD()
 {
@@ -60,6 +61,16 @@ void ABurgerHUD::BeginPlay()
 		{
 			CrosshairWidget->AddToViewport(4);
 			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	if (OrderWidgetClass)
+	{
+		OrderWidget = CreateWidget<UOrderWidget>(GetWorld(), OrderWidgetClass);
+		if (OrderWidget)
+		{
+			OrderWidget->AddToViewport(3);
+			OrderWidget->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 }
@@ -122,6 +133,22 @@ void ABurgerHUD::HideHighlightWidget() const
 	if (HighlightWidget)
 	{
 		HighlightWidget->PlayFadeOut();
+	}
+}
+
+void ABurgerHUD::ShowOrderWidget() const
+{
+	if (OrderWidget)
+	{
+		OrderWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ABurgerHUD::HideOrderWidget() const
+{
+	if (OrderWidget)
+	{
+		OrderWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 

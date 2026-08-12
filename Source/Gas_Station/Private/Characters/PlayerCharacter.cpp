@@ -11,6 +11,7 @@
 #include "UserInterface/BurgerHUD.h"
 #include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
+#include "QuestSystem/OrderSubSystem.h"
 #include "World/Pickup.h"
 
 // Sets default values
@@ -159,6 +160,13 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 	{
 		return;
 	}
+
+	UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
+	OrderSubSystem->GenerateRandomOrder();
+	OrderSubSystem->GenerateRandomOrder();
+	OrderSubSystem->GenerateRandomOrder();
+	OrderSubSystem->GenerateRandomOrder();
+
 	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
 
 	if (DroppedItem)

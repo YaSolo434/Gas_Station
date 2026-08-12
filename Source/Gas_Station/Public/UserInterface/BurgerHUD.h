@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BurgerHUD.generated.h"
 
+class UOrderWidget;
 class UItemBase;
 class UHighlightWidget;
 class UHotbarPanel;
@@ -37,6 +38,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UOrderWidget> OrderWidgetClass;
+
 	bool bIsMenuVisible;
 
 	//=================================================================================================
@@ -54,6 +58,9 @@ public:
 	void ShowHighlightWidget() const;
 	void HideHighlightWidget() const;
 	void UpdateHighlightWidget(const UItemBase* SelectedItem) const;
+
+	void ShowOrderWidget() const;
+	void HideOrderWidget() const;
 
 protected:
 	//=================================================================================================
@@ -73,6 +80,9 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+
+	UPROPERTY()
+	UOrderWidget* OrderWidget;
 
 	//=================================================================================================
 	// FUNCTIONS

@@ -9,7 +9,7 @@ struct FBurgerRecipe
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	TMap<EFoodType, int32> Ingredients;
 
 	bool operator==(const FBurgerRecipe& Other) const
