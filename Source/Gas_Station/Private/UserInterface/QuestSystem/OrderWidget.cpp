@@ -49,6 +49,41 @@ void UOrderWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UOrderWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	UpdateOrderTimes();
+}
+
+void UOrderWidget::UpdateOrderTimes()
+{
+	const UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
+	if (!OrderSubSystem)
+	{
+		return;
+	}
+	
+	const TArray<FCustomerOrder>& ActiveOrders = OrderSubSystem->GetActiveOrders();
+
+	for (const auto& Pair : OrderWidgets)
+	{
+		if (!Pair.Value)
+		{	
+			continue;
+		}
+		
+		for (const FCustomerOrder& Order : ActiveOrders)
+		{
+			if (Order.OrderID == Pair.Key)
+			{
+				Pair.Value->UpdateTimeRemaining(Order.TimeRemaining);
+				break;
+			}
+		}
+	}
+}
+
 void UOrderWidget::HandleOrderSpawned(const FCustomerOrder& Order)
 {
 	AddOrderWidget(Order);
@@ -111,16 +146,13 @@ void UOrderWidget::UpdateOrderWidgetVisibility()
 	{
 		if (ABurgerHUD* HUD = Cast<ABurgerHUD>(PC->GetHUD()))
 		{
-			if (UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>())
+			if (OrderContainer->GetAllChildren().Num() >= 1)
 			{
-				if (OrderContainer->GetAllChildren().Num() >= 1)
-				{
-					HUD->ShowOrderWidget();
-				}
-				else
-				{
-					HUD->HideOrderWidget();
-				}
+				HUD->ShowOrderWidget();
+			}
+			else
+			{
+				HUD->HideOrderWidget();
 			}
 		}
 	}

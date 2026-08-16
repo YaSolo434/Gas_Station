@@ -19,6 +19,8 @@ class GAS_STATION_API UOrderWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -46,4 +48,5 @@ private:
 	void UpdateActiveOrderWidgets();
 	void AddOrderWidget(const FCustomerOrder& Order);
 	void UpdateOrderWidgetVisibility();
+	void UpdateOrderTimes();
 };

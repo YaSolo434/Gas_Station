@@ -7,6 +7,7 @@
 #include "QuestSystem/Order/CustomerOrder.h"
 #include "CustomerOrderWidget.generated.h"
 
+class UTextBlock;
 class UOrderIngredientColumn;
 class UHorizontalBox;
 
@@ -17,10 +18,14 @@ class GAS_STATION_API UCustomerOrderWidget : public UUserWidget
 
 public:
 	void SetupOrder(const FCustomerOrder& Order);
+	void UpdateTimeRemaining(float TimeRemaining);
 
 protected:
 	UPROPERTY(meta=(BindWidget))
 	UHorizontalBox* IngredientBox;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TimeRemainingText;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Order")
 	TSubclassOf<UOrderIngredientColumn> IngredientColumnClass;

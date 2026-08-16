@@ -1,6 +1,7 @@
 // YaSolo
 #include "UserInterface/QuestSystem/CustomerOrderWidget.h"
 #include "Components/HorizontalBox.h"
+#include "Components/TextBlock.h"
 #include "UserInterface/QuestSystem/OrderIngredientColumn.h"
 
 void UCustomerOrderWidget::SetupOrder(const FCustomerOrder& Order)
@@ -40,4 +41,12 @@ void UCustomerOrderWidget::SetupOrder(const FCustomerOrder& Order)
 			IngredientBox->AddChildToHorizontalBox(Column);
 		}
 	}
+	UpdateTimeRemaining(Order.TimeRemaining);
+}
+
+void UCustomerOrderWidget::UpdateTimeRemaining(float TimeRemaining)
+{
+	const int32 Seconds = FMath::Max(0, FMath::CeilToInt(TimeRemaining));
+
+	TimeRemainingText->SetText(FText::FromString(FString::FromInt(Seconds)));
 }
