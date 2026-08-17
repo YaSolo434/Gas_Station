@@ -166,6 +166,7 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 	}
 
 	UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
+
 	OrderSubSystem->GenerateRandomOrder();
 
 	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
