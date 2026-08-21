@@ -24,8 +24,6 @@ public:
 
 	UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
 
 protected:

@@ -110,19 +110,3 @@ void ACustomer::UpdateInteractableData()
 
 	InteractableData = InstanceInteractableData;
 }
-
-void ACustomer::BeginFocus()
-{
-	if (UMeshComponent* MeshComp = this->GetMesh())
-	{
-		MeshComp->SetRenderCustomDepth(true);
-	}
-}
-
-void ACustomer::EndFocus()
-{
-	if (UMeshComponent* MeshComp = this->GetMesh())
-	{
-		MeshComp->SetRenderCustomDepth(false);
-	}
-}
