@@ -10,6 +10,8 @@ void UCustomerOrderWidget::SetupOrder(const FCustomerOrder& Order)
 	{
 		IngredientBox->ClearChildren();
 
+		OrderNumber->SetText(FText::FromString(FString::FromInt(Order.OrderNumber)));
+
 		TArray<EFoodType> IngredientTypes;
 		Order.Recipe.Ingredients.GetKeys(IngredientTypes);
 
@@ -46,7 +48,28 @@ void UCustomerOrderWidget::SetupOrder(const FCustomerOrder& Order)
 
 void UCustomerOrderWidget::UpdateTimeRemaining(float TimeRemaining)
 {
-	const int32 Seconds = FMath::Max(0, FMath::CeilToInt(TimeRemaining));
+	FNumberFormattingOptions FormattingOptions;
+	FormattingOptions.MinimumFractionalDigits = 1; // Always show at least 2 decimals
+	FormattingOptions.MaximumFractionalDigits = 1; // Cap at 2 decimals
 
-	TimeRemainingText->SetText(FText::FromString(FString::FromInt(Seconds)));
+	if (TimeRemaining <= 10.0f)
+	{
+		TimeRemainingText->SetText(FText::AsNumber(TimeRemaining, &FormattingOptions));
+		if (TimeRemaining <= 5.0f)
+		{
+			// Sine wave math bounces between 0.0 and 1.0 over time
+			const float GameTime = GetWorld()->GetTimeSeconds();
+			constexpr float FlashFrequency = 10.0f;
+			const float Alpha = (FMath::Sin(GameTime * FlashFrequency) + 1.0f) * 0.5f;
+
+			// Linear interpolate between Red and White based on the sine wave
+			const FLinearColor FlashingColor = FLinearColor::LerpUsingHSV(FLinearColor::Black, FLinearColor::Red, Alpha);
+
+			TimeRemainingText->SetColorAndOpacity(FlashingColor);
+		}
+	}
+	else
+	{
+		TimeRemainingText->SetText(FText::FromString(FString::FromInt(TimeRemaining)));
+	}
 }

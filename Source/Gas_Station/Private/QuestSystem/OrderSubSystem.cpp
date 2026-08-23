@@ -52,9 +52,10 @@ FCustomerOrder UOrderSubSystem::GenerateRandomOrder()
 	UE_LOG(LogTemp, Warning, TEXT("GenerateRandomOrder()"));
 
 	FCustomerOrder Order;
-	Order.OrderID = FGuid::NewGuid();
-	Order.TimeRemaining = FMath::RandRange(Order.MinTime, Order.MaxTime);
 
+	Order.OrderID = FGuid::NewGuid();
+	Order.OrderNumber = GetOrderNumFromID(Order.OrderID);
+	Order.TimeRemaining = FMath::RandRange(Order.MinTime, Order.MaxTime);
 
 	Order.Recipe.Ingredients.Add(EFoodType::BreadBottom, 1);
 	Order.Recipe.Ingredients.Add(EFoodType::BreadTop, 1);
@@ -70,12 +71,18 @@ FCustomerOrder UOrderSubSystem::GenerateRandomOrder()
 		Ingredients.Add(Type);
 	}
 
-	const int32 NumIngredients = FMath::RandRange(1, Ingredients.Num());
-	for (int32 i = 0; i < NumIngredients && Ingredients.Num() > 0; ++i)
+	const int32 NumIngredients = FMath::RandRange(1, Ingredients.Num() + OrderNumAdj);
+
+	for (int32 i = 0; i < NumIngredients; ++i)
 	{
 		const int32 Index = FMath::RandRange(0, Ingredients.Num() - 1);
-		Order.Recipe.Ingredients.Add(Ingredients[Index], 1);
-		Ingredients.RemoveAt(Index);
+		Order.Recipe.Ingredients.FindOrAdd(Ingredients[Index])++;
+	}
+
+	if (NumIngredients >= 3 && Order.TimeRemaining < 20)
+	{
+		Order.TimeRemaining += NumIngredients;
+		// UE_LOG(LogTemp, Warning, TEXT("%d"), Order.TimeRemaining);
 	}
 
 	Order.OrderText = BuildOrderText(Order.Recipe);
@@ -107,7 +114,6 @@ bool UOrderSubSystem::SubmitBurger(FGuid OrderID, UItemBase* ItemIn)
 			bool bCorrect = Order.Recipe == SubmittedRecipe;
 
 			Score += bCorrect ? PointsPerCorrectOrder : -PointsLostPerWrongOrder;
-			Score = FMath::Max(Score, 0);
 
 			OnOrderResult.Broadcast(Order, bCorrect);
 			OnScoreChanged.Broadcast(Score);
@@ -128,6 +134,17 @@ void UOrderSubSystem::ExpireOrder(FCustomerOrder& Order)
 
 	OnOrderResult.Broadcast(Order, false);
 	OnScoreChanged.Broadcast(Score);
+}
+
+int32 UOrderSubSystem::GetOrderNumFromID(const FGuid& InGuid)
+{
+	//get big number from the guid
+	const uint32 GuidHash = GetTypeHash(InGuid);
+
+	//make the big number down to two digits(its that simple)
+	const int32 OrderNum = FMath::Abs(static_cast<int32>(GuidHash % 100));
+
+	return OrderNum;
 }
 
 FText UOrderSubSystem::BuildOrderText(const FBurgerRecipe& Recipe) const

@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* TimeRemainingText;
 
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* OrderNumber;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Order")
 	TSubclassOf<UOrderIngredientColumn> IngredientColumnClass;
 };

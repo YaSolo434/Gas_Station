@@ -12,6 +12,9 @@ struct FCustomerOrder
 	FGuid OrderID;
 
 	UPROPERTY()
+	int32 OrderNumber;
+
+	UPROPERTY()
 	FBurgerRecipe Recipe;
 
 	UPROPERTY()

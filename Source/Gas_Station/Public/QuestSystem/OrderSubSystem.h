@@ -40,6 +40,9 @@ public:
 	UPROPERTY()
 	FOnScoreChanged OnScoreChanged;
 
+	UPROPERTY()
+	int OrderNumAdj = 1;
+
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UOrderSubSystem, STATGROUP_Tickables); }
@@ -68,4 +71,6 @@ protected:
 
 	void ExpireOrder(FCustomerOrder& Order);
 	FText BuildOrderText(const FBurgerRecipe& Recipe) const;
+
+	static int32 GetOrderNumFromID(const FGuid& InGuid);
 };

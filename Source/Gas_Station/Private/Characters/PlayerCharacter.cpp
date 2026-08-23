@@ -60,7 +60,7 @@ APlayerCharacter::APlayerCharacter()
 
 	//inventory
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-	PlayerInventory->SetSlotsCapacity(8);~
+	PlayerInventory->SetSlotsCapacity(8);
 }
 
 // Called when the game starts or when spawned

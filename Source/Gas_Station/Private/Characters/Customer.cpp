@@ -78,6 +78,9 @@ void ACustomer::GenerateNextOrder()
 	{
 		const FCustomerOrder Order = OrderSubSystem->GenerateRandomOrder();
 		CurrentOrderID = Order.OrderID;
+		CurrentOrderNum = Order.OrderNumber;
+
+		UpdateInteractableData();
 	}
 }
 
@@ -104,8 +107,8 @@ bool ACustomer::IsCurrentOrderActive() const
 void ACustomer::UpdateInteractableData()
 {
 	InstanceInteractableData.InteractableType = EInteractableType::NonPlayerCharacter;
-	InstanceInteractableData.Name = FText::FromString("Customer");
-	InstanceInteractableData.Action = FText::FromString("Serve Burger to");
+	InstanceInteractableData.Name = FText::FromString("Customer No: " + FString::FromInt(CurrentOrderNum));
+	InstanceInteractableData.Action = FText::FromString("Serve Burger to ");
 	InstanceInteractableData.InteractionDuration = 0.f;
 
 	InteractableData = InstanceInteractableData;

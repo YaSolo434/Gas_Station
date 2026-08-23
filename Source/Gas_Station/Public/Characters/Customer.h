@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Order")
 	FGuid CurrentOrderID;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = "Order")
+	int32 CurrentOrderNum;
+
 	UPROPERTY(VisibleInstanceOnly, Category = "Order")
 	FInteractableData InstanceInteractableData;
 
