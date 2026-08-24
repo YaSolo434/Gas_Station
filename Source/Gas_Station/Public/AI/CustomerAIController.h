@@ -16,6 +16,9 @@ class GAS_STATION_API ACustomerAIController : public AAIController
 public:
 	ACustomerAIController();
 
+	void SetBlackboardBoolValue(const FName BlackboardKeyName, const bool NewValue) const;
+	bool GetBlackBoardBoolValue(const FName BlackboardKeyName) const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;

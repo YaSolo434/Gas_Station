@@ -1,6 +1,5 @@
 // YaSolo
 #include "Characters/Customer.h"
-
 #include "AI/CustomerAIController.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/InventoryComponent.h"
@@ -23,6 +22,10 @@ ACustomer::ACustomer()
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
 	bUseControllerRotationYaw = false;
+
+	LastForwardCheckTime = 0.0f;
+	ForwardCheckFrequency = 0.1f;
+	ForwardCheckDistance = 50.0f;
 }
 
 // Called when the game starts or when spawned
@@ -37,6 +40,17 @@ void ACustomer::BeginPlay()
 void ACustomer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetWorld()->TimeSince(LastForwardCheckTime) > ForwardCheckFrequency)
+	{
+		PerformForwardCheck();
+	}
+}
+
+void ACustomer::SetPatrolPath(APatrolPath* InPatrolPath, float InRestaurantPatrolIndex)
+{
+	PatrolPath = InPatrolPath;
+	RestaurantPatrolIndex = InRestaurantPatrolIndex;
 }
 
 void ACustomer::Interact(APlayerCharacter* PlayerCharacter)
@@ -53,6 +67,11 @@ void ACustomer::Interact(APlayerCharacter* PlayerCharacter)
 			{
 				PlayerInventory->RemoveSelectedItem();
 			}
+			if (const ACustomerAIController* CustomerController = Cast<ACustomerAIController>(GetController()))
+			{
+				CustomerController->SetBlackboardBoolValue(TEXT("HasOrdered"), false);
+				CustomerController->SetBlackboardBoolValue(TEXT("CanMove"), true);
+			}
 		}
 	}
 }
@@ -67,6 +86,41 @@ void ACustomer::GenerateOrder()
 		CurrentOrderTime = Order.TimeRemaining;
 
 		UpdateInteractableData();
+	}
+}
+
+void ACustomer::PerformForwardCheck()
+{
+	LastForwardCheckTime = GetWorld()->GetTimeSeconds();
+
+	const FVector TraceStart{GetActorLocation()};
+	const FVector TraceEnd{TraceStart + (GetActorForwardVector() * ForwardCheckDistance)};
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FHitResult HitResult;
+	bool bHitAnotherCustomer = false;
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Pawn, QueryParams))
+	{
+		AActor* HitActor = HitResult.GetActor();
+
+		if (HitActor && HitActor->IsA(StaticClass()))
+		{
+			bHitAnotherCustomer = true;
+		}
+	}
+
+	const FColor DebugColor = bHitAnotherCustomer ? FColor::Red : FColor::Green;
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DebugColor);
+
+	if (const ACustomerAIController* CustomerController = Cast<ACustomerAIController>(GetController()))
+	{
+		if (!CustomerController->GetBlackBoardBoolValue(TEXT("HasOrdered")))
+		{
+			CustomerController->SetBlackboardBoolValue(TEXT("CanMove"), !bHitAnotherCustomer);
+		}
 	}
 }
 

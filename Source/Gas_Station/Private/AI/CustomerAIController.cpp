@@ -1,6 +1,7 @@
 // YaSolo
 #include "AI/CustomerAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/Customer.h"
 
 ACustomerAIController::ACustomerAIController()
@@ -23,4 +24,14 @@ void ACustomerAIController::OnPossess(APawn* InPawn)
 			RunBehaviorTree(BT);
 		}
 	}
+}
+
+void ACustomerAIController::SetBlackboardBoolValue(const FName BlackboardKeyName, const bool NewValue) const
+{
+	Blackboard.Get()->SetValueAsBool(BlackboardKeyName, NewValue);
+}
+
+bool ACustomerAIController::GetBlackBoardBoolValue(const FName BlackboardKeyName) const
+{
+	return Blackboard->GetValueAsBool(BlackboardKeyName);
 }

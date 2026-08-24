@@ -27,6 +27,8 @@ public:
 
 	APatrolPath* GetPatrolPath() const { return PatrolPath; }
 
+	FORCEINLINE void SetPatrolPath(APatrolPath* InPatrolPath, float InRestaurantPatrolIndex);
+
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
@@ -52,8 +54,19 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Order")
 	FInteractableData InstanceInteractableData;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(VisibleAnywhere, Category = "AI")
 	APatrolPath* PatrolPath;
+
+	UPROPERTY()
+	float LastForwardCheckTime;
+
+	UPROPERTY()
+	float ForwardCheckFrequency;
+
+	UPROPERTY()
+	float ForwardCheckDistance;
+
+	void PerformForwardCheck();
 
 private:
 	void UpdateInteractableData();

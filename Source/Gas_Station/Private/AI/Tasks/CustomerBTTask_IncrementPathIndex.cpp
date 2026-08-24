@@ -33,7 +33,7 @@ EBTNodeResult::Type UCustomerBTTask_IncrementPathIndex::ExecuteTask(UBehaviorTre
 
 				if (Index == Customer->RestaurantPatrolIndex)
 				{
-					BC->SetValueAsInt(GetSelectedBlackboardKey(), ++Index);
+					// BC->SetValueAsInt(GetSelectedBlackboardKey(), ++Index);
 
 					Customer->GenerateOrder();
 					BC->SetValueAsFloat(TEXT("WaitTime"), Customer->CurrentOrderTime + 2.0f);
