@@ -7,6 +7,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Customer.generated.h"
 
+class APatrolPath;
 struct FCustomerOrder;
 class UBehaviorTree;
 
@@ -22,9 +23,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
+	UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
+
+	APatrolPath* GetPatrolPath() const { return PatrolPath; }
 
 	virtual void Interact(APlayerCharacter* PlayerCharacter) override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	int32 RestaurantPatrolIndex;
+
+	void GenerateOrder();
+
+	float CurrentOrderTime;
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,10 +52,9 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Order")
 	FInteractableData InstanceInteractableData;
 
-private:
-	FTimerHandle DelayTimerHandle;
+	UPROPERTY(EditAnywhere, Category = "AI")
+	APatrolPath* PatrolPath;
 
-	void GenerateNextOrder();
-	bool IsCurrentOrderActive() const;
+private:
 	void UpdateInteractableData();
 };

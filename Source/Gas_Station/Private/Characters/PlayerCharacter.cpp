@@ -246,7 +246,10 @@ void APlayerCharacter::PerformInteractionCheck()
 
 			if (HitResult.GetActor() == InteractionData.CurrentInteractable)
 			{
-				HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+				if (TargetInteractable->InteractableData.InteractableType == EInteractableType::NonPlayerCharacter)
+				{
+					HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+				}
 				return;
 			}
 		}

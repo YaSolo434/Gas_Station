@@ -30,11 +30,6 @@ void ACustomer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(DelayTimerHandle,
-	                                this,
-	                                &ACustomer::GenerateNextOrder,
-	                                2.0f,
-	                                false);
 	UpdateInteractableData();
 }
 
@@ -48,13 +43,6 @@ void ACustomer::Interact(APlayerCharacter* PlayerCharacter)
 {
 	if (PlayerCharacter)
 	{
-		if (!IsCurrentOrderActive())
-		{
-			GenerateNextOrder();
-			UpdateInteractableData();
-			return;
-		}
-
 		UInventoryComponent* PlayerInventory = PlayerCharacter->GetInventory();
 		UItemBase* HeldItem = PlayerInventory->GetSelectedItem();
 
@@ -65,43 +53,21 @@ void ACustomer::Interact(APlayerCharacter* PlayerCharacter)
 			{
 				PlayerInventory->RemoveSelectedItem();
 			}
-
-			GenerateNextOrder();
-			UpdateInteractableData();
 		}
 	}
 }
 
-void ACustomer::GenerateNextOrder()
+void ACustomer::GenerateOrder()
 {
 	if (UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>())
 	{
 		const FCustomerOrder Order = OrderSubSystem->GenerateRandomOrder();
 		CurrentOrderID = Order.OrderID;
 		CurrentOrderNum = Order.OrderNumber;
+		CurrentOrderTime = Order.TimeRemaining;
 
 		UpdateInteractableData();
 	}
-}
-
-bool ACustomer::IsCurrentOrderActive() const
-{
-	const UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
-
-	if (!OrderSubSystem || !CurrentOrderID.IsValid())
-	{
-		return false;
-	}
-
-	for (const FCustomerOrder ActiveOrder : OrderSubSystem->GetActiveOrders())
-	{
-		if (ActiveOrder.OrderID == CurrentOrderID)
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void ACustomer::UpdateInteractableData()

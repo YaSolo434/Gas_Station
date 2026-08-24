@@ -7,7 +7,7 @@
 UCustomerBTTask_FindRandomLoc::UCustomerBTTask_FindRandomLoc()
 {
 	NodeName = TEXT("Find Random Location");
-	
+
 	BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UCustomerBTTask_FindRandomLoc, BlackboardKey));
 }
 
@@ -16,22 +16,22 @@ EBTNodeResult::Type UCustomerBTTask_FindRandomLoc::ExecuteTask(UBehaviorTreeComp
 	//Get AI pawn
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	const APawn* AIPawn = OwnerComp.GetAIOwner()->GetPawn();
-	
+
 	//Get Pawn origin
 	const FVector Origin{AIPawn->GetActorLocation()};
-	
+
 	//Get Nav system and find a random loc then move the AI to that loc
 	if (const UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld()))
 	{
 		FNavLocation Destination;
 		NavSys->GetRandomPointInNavigableRadius(Origin, SearchRadius, Destination);
-		
+
 		AIController->GetBlackboardComponent()->SetValueAsVector(BlackboardKey.SelectedKeyName, Destination.Location);
-		
+
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return EBTNodeResult::Succeeded;
 	}
-	
+
 	FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	return EBTNodeResult::Failed;
 }
