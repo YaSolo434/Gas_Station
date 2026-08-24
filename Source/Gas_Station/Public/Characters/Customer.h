@@ -63,7 +63,7 @@ protected:
 	UPROPERTY()
 	float ForwardCheckFrequency;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "AI")
 	float ForwardCheckDistance;
 
 	void PerformForwardCheck();
