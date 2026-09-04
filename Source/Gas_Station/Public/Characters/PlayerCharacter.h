@@ -58,6 +58,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement Settings")
 	float MovementSpeed = 600.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Settings | Crouch")
+	FVector CrouchEyeOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Settings | Crouch")
+	float MovementSpeedCrouched = 400.0f;
+
 	bool bIsMoving = false;
 
 	// target interactable
@@ -120,6 +126,8 @@ protected:
 	void MoveRight(const FInputActionValue& Value);
 	void StopMoveRight(const FInputActionValue& Value);
 
+	void StartCrouch();
+
 	UFUNCTION()
 	void Look(const FInputActionValue& Value);
 
@@ -149,6 +157,11 @@ public:
 
 	void RemoveSelectedItem() const;
 
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+
+	virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult) override;
+
 protected:
 	//=================================================================================================
 	// PROPERTIES & VARIABLES
@@ -167,6 +180,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
 	UInputAction* JumpAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input | Movement")
+	UInputAction* CrouchAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input | Interaction")
 	UInputAction* InteractAction;

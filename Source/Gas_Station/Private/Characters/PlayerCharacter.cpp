@@ -45,11 +45,16 @@ APlayerCharacter::APlayerCharacter()
 	HeldItemMesh->SetCastShadow(false);
 
 	//Set player movement settings
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
 	GetCharacterMovement()->GravityScale = 2.f;
 	GetCharacterMovement()->JumpZVelocity = 800.f;
 	GetCharacterMovement()->AirControl = 0.5f;
+
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = MovementSpeedCrouched;
 
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = false;
@@ -57,6 +62,8 @@ APlayerCharacter::APlayerCharacter()
 
 	InteractionCheckFrequency = 0.1f;
 	InteractionCheckDistance = 225.0f;
+
+	CrouchEyeOffset = FVector::Zero();
 
 	//inventory
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
@@ -111,6 +118,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	CurrentSwayOffset = FMath::VInterpTo(CurrentSwayOffset, TargetSwayLoc, DeltaTime, LocationLagSpeed);
 
 	ItemHoldSocket->SetRelativeLocation(BaseHoldLocation + CurrentSwayOffset);
+
+	CrouchEyeOffset = FMath::VInterpTo(CrouchEyeOffset, FVector::ZeroVector, DeltaTime, 8.f);
 }
 
 // Called to bind functionality to input
@@ -138,6 +147,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this,
 		                                   &ACharacter::StopJumping);
 
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this,
+		                                   &APlayerCharacter::StartCrouch);
+
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
 		                                   &APlayerCharacter::BeginInteract);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this,
@@ -164,10 +176,6 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 	{
 		return;
 	}
-
-	UOrderSubSystem* OrderSubSystem = GetWorld()->GetSubsystem<UOrderSubSystem>();
-
-	OrderSubSystem->GenerateRandomOrder();
 
 	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
 
@@ -219,6 +227,42 @@ void APlayerCharacter::RemoveSelectedItem() const
 				Child->DestroyComponent(true);
 			}
 		}
+	}
+}
+
+void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (HalfHeightAdjust == 0.f)
+	{
+		return;
+	}
+
+	float StartBaseEyeHeight = BaseEyeHeight;
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+
+	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight + HalfHeightAdjust;
+	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, BaseEyeHeight), false);
+}
+
+void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (HalfHeightAdjust == 0.f)
+	{
+		return;
+	}
+
+	float StartBaseEyeHeight = BaseEyeHeight;
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight - HalfHeightAdjust;
+	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, BaseEyeHeight), false);
+}
+
+void APlayerCharacter::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)
+{
+	if (FirstPersonCamera)
+	{
+		FirstPersonCamera->GetCameraView(DeltaTime, OutResult);
+		OutResult.Location += CrouchEyeOffset;
 	}
 }
 
@@ -446,6 +490,18 @@ void APlayerCharacter::StopMoveRight(const FInputActionValue& Value)
 	if (bIsMoving)
 	{
 		bIsMoving = false;
+	}
+}
+
+void APlayerCharacter::StartCrouch()
+{
+	if (GetCharacterMovement()->IsCrouching())
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
 	}
 }
 
