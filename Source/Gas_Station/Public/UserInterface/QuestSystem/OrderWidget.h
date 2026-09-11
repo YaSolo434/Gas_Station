@@ -20,14 +20,10 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	
 
 protected:
 	UPROPERTY(meta=(BindWidget))
 	UVerticalBox* OrderContainer;
-
-	UPROPERTY(meta=(BindWidget))
-	UTextBlock* ScoreText;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Order")
 	TSubclassOf<UCustomerOrderWidget> CustomerOrderWidgetClass;
@@ -40,9 +36,6 @@ protected:
 
 	UFUNCTION()
 	void HandleOrderResult(const FCustomerOrder& Order, bool bSuccess);
-
-	UFUNCTION()
-	void HandleScoreChanged(int32 NewScore);
 
 private:
 	void UpdateActiveOrderWidgets();

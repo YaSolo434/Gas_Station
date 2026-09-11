@@ -119,7 +119,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	ItemHoldSocket->SetRelativeLocation(BaseHoldLocation + CurrentSwayOffset);
 
-	CrouchEyeOffset = FMath::VInterpTo(CrouchEyeOffset, FVector::ZeroVector, DeltaTime, 8.f);
+	CrouchEyeOffset = FMath::VInterpTo(CrouchEyeOffset, FVector::ZeroVector, DeltaTime, 9.f);
 }
 
 // Called to bind functionality to input
@@ -177,9 +177,7 @@ void APlayerCharacter::DropItem(const FInputActionValue& Value)
 		return;
 	}
 
-	UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem();
-
-	if (DroppedItem)
+	if (UItemBase* DroppedItem = PlayerInventory->RemoveSelectedItem())
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;

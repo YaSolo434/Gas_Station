@@ -98,10 +98,16 @@ void APickup::TakePickup(const APlayerCharacter* Taker)
 					break;
 
 				case EItemAddResult::IAR_AllItemAdded:
-					Destroy();
+					if (ItemReference->ItemType != EItemType::Food || ItemReference->FoodType == EFoodType::CompletedBurger)
+					{
+						Destroy();
+					}
 					break;
 				case EItemAddResult::IAR_ItemAddedToSelectedSlot:
-					Destroy();
+					if (ItemReference->ItemType != EItemType::Food || ItemReference->FoodType == EFoodType::CompletedBurger)
+					{
+						Destroy();
+					}
 					break;
 				}
 

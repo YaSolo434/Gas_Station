@@ -41,7 +41,7 @@ public:
 	FOnScoreChanged OnScoreChanged;
 
 	UPROPERTY()
-	int OrderNumAdj = 1;
+	int OrderNumAdj = 0;
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Tick(float DeltaTime) override;

@@ -26,12 +26,6 @@ void UOrderWidget::NativeConstruct()
 
 	OrderSubSystem->OnOrderSpawned.AddDynamic(this, &UOrderWidget::HandleOrderSpawned);
 	OrderSubSystem->OnOrderResult.AddDynamic(this, &UOrderWidget::HandleOrderResult);
-	OrderSubSystem->OnScoreChanged.AddDynamic(this, &UOrderWidget::HandleScoreChanged);
-
-	if (ScoreText)
-	{
-		ScoreText->SetText(FText::AsNumber(OrderSubSystem->GetScore()));
-	}
 
 	UpdateActiveOrderWidgets();
 	UpdateOrderWidgetVisibility();
@@ -43,7 +37,6 @@ void UOrderWidget::NativeDestruct()
 	{
 		OrderSubSystem->OnOrderSpawned.RemoveDynamic(this, &UOrderWidget::HandleOrderSpawned);
 		OrderSubSystem->OnOrderResult.RemoveDynamic(this, &UOrderWidget::HandleOrderResult);
-		OrderSubSystem->OnScoreChanged.RemoveDynamic(this, &UOrderWidget::HandleScoreChanged);
 	}
 
 	Super::NativeDestruct();
@@ -52,7 +45,7 @@ void UOrderWidget::NativeDestruct()
 void UOrderWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	
+
 	UpdateOrderTimes();
 }
 
@@ -63,16 +56,16 @@ void UOrderWidget::UpdateOrderTimes()
 	{
 		return;
 	}
-	
+
 	const TArray<FCustomerOrder>& ActiveOrders = OrderSubSystem->GetActiveOrders();
 
 	for (const auto& Pair : OrderWidgets)
 	{
 		if (!Pair.Value)
-		{	
+		{
 			continue;
 		}
-		
+
 		for (const FCustomerOrder& Order : ActiveOrders)
 		{
 			if (Order.OrderID == Pair.Key)
@@ -101,14 +94,6 @@ void UOrderWidget::HandleOrderResult(const FCustomerOrder& Order, bool bSuccess)
 		OrderWidgets.Remove(Order.OrderID);
 	}
 	UpdateOrderWidgetVisibility();
-}
-
-void UOrderWidget::HandleScoreChanged(int32 NewScore)
-{
-	if (ScoreText)
-	{
-		ScoreText->SetText(FText::AsNumber(NewScore));
-	}
 }
 
 void UOrderWidget::UpdateActiveOrderWidgets()

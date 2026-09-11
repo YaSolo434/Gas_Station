@@ -12,6 +12,7 @@ void ACustomerSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SpawnCustomer();
 	HandleCustomerSpawning();
 }
 
