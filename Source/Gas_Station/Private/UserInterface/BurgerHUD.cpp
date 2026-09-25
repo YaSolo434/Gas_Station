@@ -5,6 +5,7 @@
 #include "UserInterface/Inventory/HighlightWidget.h"
 #include "UserInterface/Inventory/Hotbar/HotbarPanel.h"
 #include "UserInterface/QuestSystem/OrderWidget.h"
+#include "UserInterface/QuestSystem/ScoreWidget.h"
 
 ABurgerHUD::ABurgerHUD()
 {
@@ -71,6 +72,16 @@ void ABurgerHUD::BeginPlay()
 		{
 			OrderWidget->AddToViewport(3);
 			OrderWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+	
+	if (ScoreWidgetClass)
+	{
+		ScoreWidget = CreateWidget<UScoreWidget>(GetWorld(), ScoreWidgetClass);
+		if (ScoreWidget)
+		{
+			ScoreWidget->AddToViewport(-1);
+			ScoreWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 }

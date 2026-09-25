@@ -40,9 +40,6 @@ public:
 	UPROPERTY()
 	FOnScoreChanged OnScoreChanged;
 
-	UPROPERTY()
-	int OrderNumAdj = 0;
-
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UOrderSubSystem, STATGROUP_Tickables); }

@@ -71,7 +71,7 @@ FCustomerOrder UOrderSubSystem::GenerateRandomOrder()
 		Ingredients.Add(Type);
 	}
 
-	const int32 NumIngredients = FMath::RandRange(1, Ingredients.Num() + OrderNumAdj);
+	const int32 NumIngredients = FMath::RandRange(1, Ingredients.Num());
 
 	for (int32 i = 0; i < NumIngredients; ++i)
 	{

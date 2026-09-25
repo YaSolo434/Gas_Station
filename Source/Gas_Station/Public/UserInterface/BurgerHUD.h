@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BurgerHUD.generated.h"
 
+class UScoreWidget;
 class UOrderWidget;
 class UItemBase;
 class UHighlightWidget;
@@ -40,6 +41,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UOrderWidget> OrderWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UScoreWidget> ScoreWidgetClass;
 
 	bool bIsMenuVisible;
 
@@ -83,6 +87,9 @@ protected:
 
 	UPROPERTY()
 	UOrderWidget* OrderWidget;
+	
+	UPROPERTY()
+	UScoreWidget* ScoreWidget;
 
 	//=================================================================================================
 	// FUNCTIONS

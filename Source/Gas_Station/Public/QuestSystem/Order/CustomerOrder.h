@@ -27,5 +27,5 @@ struct FCustomerOrder
 	float MaxTime = 50.f;
 
 	UPROPERTY()
-	float MinTime = 10.f;
+	float MinTime = 20.f;
 };
