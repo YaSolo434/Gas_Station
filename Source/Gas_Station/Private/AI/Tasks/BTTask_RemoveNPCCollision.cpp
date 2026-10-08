@@ -3,6 +3,7 @@
 
 #include "AI/CustomerAIController.h"
 #include "Components/CapsuleComponent.h"
+#include "Game/Gas_Station.h"
 #include "GameFramework/Character.h"
 
 UMyBTTask_RemoveNPCCollision::UMyBTTask_RemoveNPCCollision(const FObjectInitializer& OI)
@@ -15,7 +16,7 @@ EBTNodeResult::Type UMyBTTask_RemoveNPCCollision::ExecuteTask(UBehaviorTreeCompo
 	if (const ACustomerAIController* AICont = Cast<ACustomerAIController>(OwnerComp.GetAIOwner()))
 	{
 		AICont->GetCharacter()->GetCapsuleComponent()->SetCollisionResponseToChannel
-			(ECC_GameTraceChannel1, ECR_Ignore);
+			(ECC_NPC_COLLISION, ECR_Ignore);
 
 		return EBTNodeResult::Succeeded;
 	}

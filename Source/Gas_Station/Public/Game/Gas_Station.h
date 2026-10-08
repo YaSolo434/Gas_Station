@@ -4,3 +4,4 @@
 
 #include "CoreMinimal.h"
 
+#define ECC_NPC_COLLISION ECC_GameTraceChannel1
