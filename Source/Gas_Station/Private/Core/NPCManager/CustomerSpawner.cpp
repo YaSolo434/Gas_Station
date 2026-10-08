@@ -39,10 +39,12 @@ void ACustomerSpawner::SpawnCustomer()
 			const FRotator SpawnRotation{GetActorRotation()};
 
 			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			SpawnParams.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 			SpawnParams.Owner = this;
 
-			ACustomer* SpawnedCustomer = World->SpawnActor<ACustomer>(CustomerClass, SpawnLocation, SpawnRotation, SpawnParams);
+			ACustomer* SpawnedCustomer = World->SpawnActor<ACustomer>(CustomerClass, SpawnLocation, SpawnRotation,
+			                                                          SpawnParams);
 
 			if (SpawnedCustomer && AssignedPatrolPath)
 			{
